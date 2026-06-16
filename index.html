@@ -495,8 +495,22 @@
   .result-sub {
     font-size: 0.9rem;
     color: var(--ink-soft);
-    margin: 0 0 1.5rem;
+    margin: 0 0 0.6rem;
   }
+
+  .result-tip {
+    font-size: 0.85rem;
+    color: var(--ink);
+    background: var(--accent-soft);
+    border-radius: 12px;
+    padding: 0.6rem 0.9rem;
+    margin: 0 0 1.5rem;
+    text-align: left;
+  }
+
+  .result-tip.pass { background: var(--mint-soft); }
+
+  .result-tip.hidden { display: none; }
 
   .result-stats {
     display: flex;
@@ -908,6 +922,7 @@
     <div id="resultBadge" class="result-badge"></div>
     <p class="result-title" id="resultTitle"></p>
     <p class="result-sub" id="resultSub"></p>
+    <p class="result-tip" id="resultTip"></p>
 
     <div class="result-stats" id="resultStats"></div>
 
@@ -1573,6 +1588,27 @@ const A1_BASIC_WORDS = new Set([
   'haus','tag','zeit','mensch','kind','mann','frau','arbeit','schule','essen'
 ]);
 
+// One short, actionable tip per criterion, shown after a failed round for
+// whichever criterion scored lowest.
+const CRITERIA_TIPS = {
+  erfullung: "Try saying a bit more, and make sure you actually answer the question being asked.",
+  flussigkeit: "Try to keep talking without long pauses — it's okay to repeat a word while you think of the next one.",
+  wortschatz: "Try using a few different words instead of repeating the same ones.",
+  koharenz: "Try linking your sentences with words like weil, deshalb, trotzdem, or und.",
+  korrektheit: "Try slowing down slightly and focusing on getting your sentences grammatically right."
+};
+
+// One short praise message per criterion, shown after a passed round for
+// whichever criterion scored highest. Where possible this gets made more
+// specific at render time (e.g. naming the actual connector word used).
+const CRITERIA_PRAISE = {
+  erfullung: "You gave a full, on-topic answer.",
+  flussigkeit: "You kept a smooth, natural pace.",
+  wortschatz: "You used a nice variety of words.",
+  koharenz: "You linked your ideas together well.",
+  korrektheit: "Your sentences came together solidly."
+};
+
 // Minimum words expected per rung, tuned per level (B1 expects more than A1 at the same rung number)
 const MIN_WORDS = {
   A1: { 1: 4,  2: 6,  3: 9,  4: 13, 5: 17 },
@@ -1731,6 +1767,31 @@ function renderResult() {
   document.getElementById('resultSub').textContent = isFrontier
     ? (lastResult.pass ? `Level ${lastResult.rung} cleared — climbing up!` : `Level ${lastResult.rung} — let's try an easier one next.`)
     : `Level ${lastResult.rung} — just practice, your progress is unchanged.`;
+
+  const tipEl = document.getElementById('resultTip');
+  if (lastResult.criteria && lastResult.criteria.length > 0) {
+    if (lastResult.pass) {
+      const strongest = lastResult.criteria.reduce((max, c) => c.score > max.score ? c : max, lastResult.criteria[0]);
+      let praise = CRITERIA_PRAISE[strongest.key];
+      // Make Kohärenz praise specific by naming an actual connector word used, if we can find one.
+      if (strongest.key === 'koharenz' && lastResult.transcript) {
+        const transcriptWords = lastResult.transcript.toLowerCase().split(/\s+/).map(w => w.replace(/[.,!?]/g, ''));
+        const usedConnector = CONNECTOR_WORDS.find(cw => transcriptWords.includes(cw));
+        if (usedConnector) praise = `You linked your ideas well using "${usedConnector}".`;
+      }
+      tipEl.textContent = praise ? `✨ ${praise}` : '';
+      tipEl.classList.toggle('hidden', !praise);
+      tipEl.classList.toggle('pass', true);
+    } else {
+      const weakest = lastResult.criteria.reduce((min, c) => c.score < min.score ? c : min, lastResult.criteria[0]);
+      const tip = CRITERIA_TIPS[weakest.key];
+      tipEl.textContent = tip ? `💡 ${tip}` : '';
+      tipEl.classList.toggle('hidden', !tip);
+      tipEl.classList.toggle('pass', false);
+    }
+  } else {
+    tipEl.classList.add('hidden');
+  }
 
   document.getElementById('resultStats').innerHTML = `
     <div class="result-stat"><span class="val">${lastResult.wordCount}</span><span class="lbl">Words</span></div>
