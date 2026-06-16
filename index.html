@@ -1939,6 +1939,9 @@ function scoreFreepassRound(words, wordCount, wpm, fillerCount, duration, normal
   renderResult();
   show('resultScreen');
 }
+
+async function translateText(text, fromLang, toLang) {
+  if (!text || text.trim().length === 0) return '';
   try {
     const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${fromLang}|${toLang}`;
     const res = await fetch(url);
