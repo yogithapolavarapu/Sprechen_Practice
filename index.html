@@ -1155,6 +1155,23 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let knownProfilesCache = [];
 let ladderCache = {};       // { [level]: rung }
 let historyCache = [];      // array of round entries, newest first
+let wordlistCache = {};     // { word: 'A1' | 'A2' | 'B1' } — independent reference list, not profile-specific
+
+async function loadWordlist() {
+  try {
+    const { data, error } = await sb.from('goethe_wordlist').select('word, level');
+    if (error) throw error;
+    wordlistCache = {};
+    (data || []).forEach(row => { wordlistCache[row.word] = row.level; });
+  } catch (e) {
+    wordlistCache = {};
+  }
+  return wordlistCache;
+}
+
+function classifyWord(word) {
+  return wordlistCache[word] || null; // null = not found in our reference list
+}
 
 async function loadKnownProfiles() {
   try {
@@ -1574,20 +1591,6 @@ document.getElementById('finishBtn').addEventListener('click', () => {
 const FILLER_WORDS = ['äh','ähm','also','halt','irgendwie','sozusagen'];
 const CONNECTOR_WORDS = ['und','aber','weil','deshalb','dann','trotzdem','außerdem','denn','also','oder','wenn','obwohl','sondern','während','damit','dadurch','deswegen','allerdings','dafür','dagegen'];
 
-// A small set of very common A1-level words (articles, basic verbs, pronouns,
-// everyday nouns). Used only to flag when a B1 answer leans almost entirely
-// on beginner vocabulary instead of more developed language — not a
-// complete A1 wordlist, just the highest-frequency items.
-const A1_BASIC_WORDS = new Set([
-  'ich','du','er','sie','es','wir','ihr','der','die','das','ein','eine','einen',
-  'ist','sind','war','bin','bist','hat','habe','haben','und','oder','aber',
-  'gut','schlecht','groß','klein','schön','mag','mache','machen','gehe','gehen',
-  'esse','essen','trinke','trinken','sehe','sehen','sage','sagen','komme','kommen',
-  'ja','nein','auch','sehr','viel','wenig','heute','morgen','gestern','immer','nie',
-  'hier','dort','jetzt','dann','was','wer','wo','wie','warum','mein','dein','sein',
-  'haus','tag','zeit','mensch','kind','mann','frau','arbeit','schule','essen'
-]);
-
 // One short, actionable tip per criterion, shown after a failed round for
 // whichever criterion scored lowest.
 const CRITERIA_TIPS = {
@@ -1680,20 +1683,29 @@ function scoreRound() {
   fluencyScore = Math.max(0, Math.round(fluencyScore - pausePenalty - fillerPenalty));
 
   // 3. Wortschatz (Vocabulary range) — lexical diversity vs. level-tuned
-  // target, plus (B1 only) a check that you're not relying purely on basic
-  // A1-level words when more advanced vocabulary would be expected.
+  // target, plus a real classification of every recognized word against our
+  // independent A1/A2/B1 reference list (stored in Supabase). This only
+  // adjusts the score for B1, where using almost entirely A1-level words
+  // should be penalized; A1/A2 stay diversity-only since using basic words
+  // at those levels is expected, not a weakness.
   const uniqueWords = new Set(normalizedWords);
   const diversityRatio = normalizedWords.length > 0 ? uniqueWords.size / normalizedWords.length : 0;
   const targetRatio = VOCAB_TARGET_RATIO[currentLevel];
   let vocabScore = Math.round(Math.min(100, (diversityRatio / targetRatio) * 100));
-  if (currentLevel === 'B1' && normalizedWords.length > 0) {
-    const basicCount = normalizedWords.filter(w => A1_BASIC_WORDS.has(w)).length;
-    const basicRatio = basicCount / normalizedWords.length;
-    // If the vast majority of words used are A1-level basics, dock the score —
-    // some basic words are unavoidable (articles, common verbs), so only
-    // penalize when they dominate the answer.
-    if (basicRatio > 0.7) {
-      vocabScore = Math.round(vocabScore * (1 - (basicRatio - 0.7)));
+
+  const wordLevels = normalizedWords.map(w => classifyWord(w));
+  const a1Count = wordLevels.filter(lvl => lvl === 'A1').length;
+  const a2Count = wordLevels.filter(lvl => lvl === 'A2').length;
+  const b1Count = wordLevels.filter(lvl => lvl === 'B1').length;
+  const classifiedCount = a1Count + a2Count + b1Count;
+
+  if (currentLevel === 'B1' && classifiedCount > 0) {
+    const a1Ratio = a1Count / classifiedCount;
+    // If the vast majority of recognized words are A1-level basics, dock the
+    // score — some basic words (articles, common verbs) are unavoidable, so
+    // only penalize when they dominate the answer.
+    if (a1Ratio > 0.7) {
+      vocabScore = Math.round(vocabScore * (1 - (a1Ratio - 0.7)));
     }
   }
 
@@ -2098,7 +2110,7 @@ initDarkMode();
 (async function init() {
   let saved = '';
   try { saved = localStorage.getItem('spiel-current-profile') || ''; } catch (e) {}
-  await loadKnownProfiles();
+  await Promise.all([loadKnownProfiles(), loadWordlist()]);
   if (saved && getKnownProfiles().some(p => p.name === saved)) {
     selectProfile(saved);
   } else {
