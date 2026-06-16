@@ -3,53 +3,53 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>German Flashcards</title>
+<title>Sprechen — Speaking Game</title>
 
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#3A5A78">
+<meta name="theme-color" content="#072614">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Vokabelkarten">
+<meta name="apple-mobile-web-app-title" content="Sprechen">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" href="icon-192.png">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #F7F5F0;
+    --bg: #FFF8EE;
+    --ink: #2D1B3D;
+    --ink-soft: #6B5A7A;
+    --coral: #FF6B5B;
+    --coral-soft: #FF6B5B22;
+    --yellow: #FFC857;
+    --yellow-soft: #FFC85733;
+    --mint: #6FE3C4;
+    --mint-soft: #6FE3C433;
     --card: #FFFFFF;
-    --ink: #2B2A28;
-    --ink-soft: #6E6B64;
-    --accent: #3A5A78;
-    --accent-soft: #DCE6EE;
-    --gold: #C99A3B;
-    --gold-soft: #F6ECD6;
-    --border: #E4E0D8;
-    --red: #B5564A;
-    --red-soft: #F5E4E1;
-    --btn-text: #fff;
-    --btn-hover: #2e4a63;
+    --border: #2D1B3D14;
+    --shadow: #2D1B3D1f;
+    --accent: #FF6B5B;
+    --accent-soft: #FF6B5B22;
+    --accent-shadow: #C94A3D;
   }
 
-  [data-theme="dark"] {
-    --bg: #0D1117;
-    --card: #161B22;
-    --ink: #E6EDF3;
-    --ink-soft: #8B949E;
-    --accent: #5B8BAE;
-    --accent-soft: #1E2D3A;
-    --gold: #E3B341;
-    --gold-soft: #3A2F0F;
-    --border: #30363D;
-    --red: #F47067;
-    --red-soft: #3D1F1C;
-    --btn-text: #fff;
-    --btn-hover: #4A748F;
+  body.dark-mode {
+    --bg: #072614;
+    --ink: #EAF3EC;
+    --ink-soft: #8FAE9B;
+    --coral: #FF8A72;
+    --coral-soft: #FF8A7233;
+    --yellow: #FFD174;
+    --yellow-soft: #FFD17433;
+    --mint: #6FE3C4;
+    --mint-soft: #6FE3C433;
+    --card: #0E3B22;
+    --border: #ffffff14;
+    --shadow: #00000055;
   }
 
   * { box-sizing: border-box; }
@@ -59,22 +59,42 @@
     background: var(--bg);
     color: var(--ink);
     font-family: 'Inter', sans-serif;
-    display: flex;
-    justify-content: center;
-    padding: 2rem 1rem;
+    min-height: 100vh;
+    padding: 1.5rem 1rem 4rem;
   }
 
-  main {
-    width: 100%;
-    max-width: 480px;
+  main { max-width: 480px; margin: 0 auto; }
+
+  h1, h2, .display {
+    font-family: 'Fraunces', serif;
   }
 
   header {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    margin-bottom: 2rem;
-    gap: 8px;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+
+  h1 {
+    font-size: 1.7rem;
+    font-weight: 800;
+    margin: 0;
+    color: var(--ink);
+  }
+
+  h1 span { color: var(--accent); }
+
+  .profile-subtitle {
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+    margin: 2px 0 0;
+    font-weight: 600;
+  }
+
+  .profile-subtitle a {
+    color: var(--accent);
+    text-decoration: none;
   }
 
   .header-actions {
@@ -83,740 +103,496 @@
     flex-shrink: 0;
   }
 
-  .mode-toggle-btn {
+  .icon-toggle {
     background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    height: 36px;
-    padding: 0 10px;
-    display: flex;
-    align-items: center;
+    border: none;
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    font-size: 1.1rem;
     cursor: pointer;
-    flex-shrink: 0;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: var(--ink-soft);
-    letter-spacing: 0.05em;
-    transition: all 0.15s;
+    box-shadow: 0 2px 0 var(--shadow);
+    transition: transform 0.1s;
   }
 
-  .mode-toggle-btn:hover {
-    border-color: var(--accent);
-    color: var(--ink);
-  }
+  .icon-toggle:active { transform: translateY(2px); box-shadow: 0 0 0 var(--shadow); }
 
-  .mode-toggle-btn.fun {
-    background: var(--accent);
-    color: var(--btn-text);
-    border-color: var(--accent);
-  }
-
-  #themeToggle {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    width: 36px;
-    height: 36px;
+  /* Level tabs */
+  .level-tabs {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    flex-shrink: 0;
-    padding: 7px;
-    color: var(--ink-soft);
-    font-size: 16px;
-  }
-
-  #themeToggle:hover {
-    border-color: var(--accent);
-    color: var(--ink);
-  }
-
-  #themeToggle .inner-box {
-    width: 100%;
-    height: 100%;
-    border-radius: 4px;
-    border: 1px solid var(--ink-soft);
-    background: var(--ink);
-    transition: background 0.15s, border-color 0.15s;
-  }
-
-  #themeToggle:hover .inner-box {
-    border-color: var(--accent);
-  }
-
-  h1 {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 1.4rem;
-    font-weight: 700;
-    margin: 0;
-    letter-spacing: -0.02em;
-  }
-
-  h1 span {
-    color: var(--accent);
-  }
-
-  .subtitle {
-    font-size: 0.85rem;
-    color: var(--ink-soft);
-    margin: 4px 0 0;
-  }
-
-  .subtitle a {
-    color: var(--accent);
-    text-decoration: none;
-  }
-
-  .subtitle a:hover {
-    text-decoration: underline;
-  }
-
-  .stats {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 12px;
+    gap: 8px;
     margin-bottom: 1.5rem;
   }
-  .stat {
+
+  .level-tab {
+    flex: 1;
+    font-family: 'Fraunces', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
     background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 0.85rem 1rem;
+    border: none;
+    border-radius: 14px;
+    padding: 0.8rem 0.5rem;
+    cursor: pointer;
+    color: var(--ink-soft);
+    box-shadow: 0 3px 0 var(--shadow);
+    transition: transform 0.1s;
   }
 
-  .stat-label {
-    font-size: 0.7rem;
+  .level-tab:active { transform: translateY(2px); }
+
+  .level-tab.active { background: var(--accent); color: white; }
+
+  /* Ladder */
+  .ladder-wrap {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 1.5rem 1.2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 0 var(--shadow);
+  }
+
+  .ladder-title {
+    font-size: 0.8rem;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: var(--ink-soft);
-    margin: 0 0 4px;
-  }
-
-  .stat-value {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 1.6rem;
     font-weight: 700;
-    margin: 0;
-  }
-
-  .stat.due .stat-value {
-    color: var(--accent);
-    border-bottom: 3px solid var(--gold);
-    display: inline-block;
-    padding-bottom: 2px;
-  }
-
-  .card-zone {
-    perspective: 1200px;
-    perspective-origin: center;
-    margin-bottom: 1.5rem;
-    height: 180px;
-  }
-
-  .flip-card {
-    position: relative;
-    width: 100%;
-    height: 180px;
-    cursor: pointer;
-    transform-style: preserve-3d;
-  }
-
-  .flip-inner {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    transition: transform 0.5s cubic-bezier(.2,.8,.2,1);
-    transform-style: preserve-3d;
-  }
-
-  .flip-card.flipped .flip-inner {
-    transform: rotateY(180deg);
-  }
-
-  .face {
-    position: absolute;
-    inset: 0;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 1.5rem;
-  }
-
-  .face .lang {
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--ink-soft);
-    margin: 0 0 10px;
-  }
-
-  .face .word {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 1.6rem;
-    font-weight: 700;
-    margin: 0;
-    word-break: break-word;
-  }
-
-  .face .hint {
-    font-size: 0.75rem;
-    color: var(--ink-soft);
-    margin-top: 14px;
-  }
-
-  .face .example {
-    font-size: 0.8rem;
-    font-family: var(--font-serif, Georgia, serif);
-    font-style: italic;
-    color: var(--ink-soft);
-    margin-top: 12px;
-    max-width: 90%;
-  }
-
-  .face .note-tag {
-    font-size: 0.7rem;
-    font-family: 'Inter', sans-serif;
-    font-weight: 500;
-    color: var(--accent);
-    background: var(--accent-soft);
-    border-radius: 6px;
-    padding: 2px 8px;
-    margin-top: 8px;
-    max-width: 90%;
+    margin: 0 0 1rem;
     text-align: center;
   }
 
-  .face.back {
-    transform: rotateY(180deg);
-  }
-
-  .face.back .word {
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 600;
-  }
-
-  .icon-btn {
-    position: absolute;
-    background: none;
-    border: none;
-    color: var(--ink-soft);
-    cursor: pointer;
-    padding: 6px;
+  .ladder-rungs {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 6px;
-    font-size: 16px;
-  }
-
-  .icon-btn:hover {
-    color: var(--ink);
-    background: var(--accent-soft);
-  }
-
-  .speak-btn {
-    top: 10px;
-    right: 10px;
-  }
-
-  .edit-btn {
-    top: 10px;
-    left: 10px;
-  }
-
-  .empty-state {
-    background: var(--card);
-    border: 1px dashed var(--border);
-    border-radius: 14px;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    color: var(--ink-soft);
-    font-size: 0.9rem;
-    padding: 1.5rem;
-    box-sizing: border-box;
-  }
-
-  .practice-filters {
-    display: flex;
-    gap: 8px;
-  }
-
-  .practice-filters button {
-    font-family: 'Inter', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 500;
-    background: var(--accent);
-    color: var(--btn-text);
-    border: none;
-    border-radius: 8px;
-    padding: 0.5rem 0.9rem;
-    cursor: pointer;
-  }
-
-  .practice-filters button:hover {
-    background: var(--btn-hover);
-  }
-
-  .grade-row {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    margin-bottom: 0.75rem;
-    height: 44px;
-  }
-
-  .grade-row.hidden {
-    visibility: hidden;
-  }
-
-  .grade-row button {
-    font-family: 'Inter', sans-serif;
-    font-size: 0.8rem;
-    font-weight: 500;
-    border: 1px solid var(--border);
-    background: var(--card);
-    border-radius: 8px;
-    cursor: pointer;
-    color: var(--ink);
-    transition: background 0.15s, border-color 0.15s;
-  }
-
-  .grade-row button:hover {
-    background: var(--accent-soft);
-    border-color: var(--accent);
-  }
-
-  .grade-row button[data-q="3"]:hover {
-    background: var(--gold-soft);
-    border-color: var(--gold);
-  }
-
-  .toolbar {
-    display: flex;
-    align-items: center;
     justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 1.25rem;
-    font-size: 0.8rem;
-  }
-
-  .toolbar-label {
-    color: var(--ink-soft);
-    margin-right: 6px;
-  }
-
-  .toolbar-group {
-    display: flex;
-    align-items: center;
+    align-items: flex-end;
     gap: 6px;
-    flex-wrap: wrap;
-  }
-
-  .toolbar button {
-    font-family: 'Inter', sans-serif;
-    font-size: 0.8rem;
-    font-weight: 500;
-    border: 1px solid var(--border);
-    background: var(--card);
-    color: var(--ink);
-    border-radius: 8px;
-    padding: 0.4rem 0.7rem;
-    cursor: pointer;
-    transition: background 0.15s, border-color 0.15s;
-  }
-
-  .toolbar button:hover {
-    background: var(--accent-soft);
-    border-color: var(--accent);
-  }
-
-  #shuffleBtn i {
-    font-size: 14px;
-    vertical-align: -2px;
-    margin-right: 4px;
-  }
-
-  .add-form {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 1rem;
-    margin-top: 0.25rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--border);
-  }
-
-  .add-form input {
-    flex: 1;
-    min-width: 0;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.9rem;
-    padding: 0.6rem 0.75rem;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--card);
-    color: var(--ink);
-  }
-
-  .add-form input:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-soft);
-  }
-
-  .example-input {
-    width: 100%;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.85rem;
-    padding: 0.5rem 0.75rem;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--card);
-    color: var(--ink);
-    margin-top: 8px;
     margin-bottom: 0.5rem;
   }
 
-  .example-input:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-soft);
+  .rung {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
   }
 
-  .add-form button {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.85rem;
+  .rung-bar {
+    width: 100%;
+    border-radius: 8px 8px 4px 4px;
+    background: var(--border);
+    transition: all 0.3s;
+  }
+
+  .rung-num {
+    font-family: 'Fraunces', serif;
     font-weight: 700;
-    background: var(--accent);
-    color: var(--btn-text);
-    border: none;
-    border-radius: 8px;
-    padding: 0 1.1rem;
-    cursor: pointer;
-  }
-
-  .add-form button:hover {
-    background: var(--btn-hover);
-  }
-
-  .add-form button:disabled {
-    opacity: 0.6;
-    cursor: default;
-  }
-
-  .status-line {
-    font-size: 0.75rem;
-    color: var(--ink-soft);
-    margin: 0;
-    min-height: 0;
-  }
-
-  .status-line.error {
-    color: var(--red);
-  }
-
-  footer {
-    margin-top: 0.75rem;
-    text-align: center;
-    font-size: 0.75rem;
-    color: var(--ink-soft);
-  }
-
-  .ios-install-btn {
+    font-size: 0.85rem;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    width: 100%;
-    margin-top: 2rem;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 600;
+    background: var(--border);
+    color: var(--ink-soft);
+  }
+
+  .rung.done .rung-num { background: var(--accent); color: white; opacity: 0.6; }
+  .rung.current .rung-num {
     background: var(--accent);
-    color: var(--btn-text);
-    border: none;
-    border-radius: 10px;
-    padding: 0.7rem;
-    cursor: pointer;
+    color: white;
+    box-shadow: 0 0 0 4px var(--accent-soft);
+  }
+  .rung.locked .rung-num { opacity: 0.3; }
+
+  /* Challenge card */
+  .challenge-card {
+    background: var(--card);
+    border-radius: 24px;
+    padding: 1.8rem 1.4rem;
+    text-align: center;
+    box-shadow: 0 5px 0 var(--shadow);
+    margin-bottom: 1.2rem;
   }
 
-  .ios-install-btn:hover { background: var(--btn-hover); }
-  .ios-install-btn.hidden { display: none; }
-
-  .word-of-day {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--gold-soft);
-    border: 1px solid var(--gold);
-    border-radius: 10px;
-    padding: 0.5rem 0.85rem;
-    font-size: 0.85rem;
-    margin-bottom: 1rem;
-    flex-wrap: wrap;
-  }
-
-  .word-of-day.hidden { display: none; }
-
-  .wod-label {
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--gold);
-    font-weight: 600;
-    flex-shrink: 0;
-  }
-
-  .wod-word {
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 700;
-    color: var(--ink);
-  }
-
-  .wod-back {
-    color: var(--ink-soft);
-    font-size: 0.8rem;
-  }
-
-  .mode-toggles {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-    margin-bottom: 0.75rem;
-  }
-
-  .mode-btn {
-    font-family: 'Inter', sans-serif;
+  .challenge-rung-badge {
+    display: inline-block;
+    font-family: 'Fraunces', serif;
     font-size: 0.75rem;
-    font-weight: 500;
-    border: 1px solid var(--border);
-    background: var(--card);
-    color: var(--ink-soft);
-    border-radius: 20px;
-    padding: 4px 10px;
-    cursor: pointer;
-    transition: all 0.15s;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 999px;
+    margin-bottom: 1rem;
+    color: white;
   }
 
-  .mode-btn:hover, .mode-btn.active {
-    background: var(--accent-soft);
-    border-color: var(--accent);
+  .challenge-prompt {
+    font-family: 'Fraunces', serif;
+    font-size: 1.4rem;
+    font-weight: 600;
+    line-height: 1.4;
+    margin: 0 0 1.5rem;
     color: var(--ink);
   }
 
-  .mode-btn.active {
-    font-weight: 600;
+  .play-btn {
+    font-family: 'Fraunces', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 16px;
+    padding: 0.9rem 2.2rem;
+    cursor: pointer;
+    box-shadow: 0 4px 0 var(--accent-shadow);
+    transition: transform 0.1s;
   }
 
-  .history-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.6rem 0;
-    border-bottom: 1px solid var(--border);
+  .play-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--accent-shadow); }
+
+  .skip-link {
+    display: block;
+    margin: 0.8rem auto 0;
     font-size: 0.85rem;
-    gap: 8px;
-  }
-
-  .history-item:last-child { border-bottom: none; }
-
-  .history-win { color: var(--gold); font-weight: 600; }
-  .history-loss { color: var(--red); font-weight: 600; }
-
-  .section-toggle {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    width: 100%;
+    color: var(--ink-soft);
     background: none;
     border: none;
-    color: var(--ink-soft);
-    font-family: 'Inter', sans-serif;
-    font-size: 0.8rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    padding: 0.75rem 0;
-    border-top: 1px solid var(--border);
     cursor: pointer;
+    text-decoration: underline;
   }
 
-  .section-toggle:hover {
-    color: var(--ink);
-  }
-
-  .section-toggle i {
-    font-size: 14px;
-    transition: transform 0.15s;
-  }
-
-  .section-toggle.open i {
-    transform: rotate(180deg);
-  }
-
-  .deck-section {
-    padding-bottom: 1rem;
-  }
-
-  .deck-section.hidden {
-    display: none;
-  }
-
-  .deck-list {
+  /* Stats strip */
+  .stats-strip {
     display: flex;
-    flex-direction: column;
-    gap: 6px;
-    max-height: 300px;
-    overflow-y: auto;
-    margin-top: 0.75rem;
+    gap: 10px;
+    margin-bottom: 1.5rem;
   }
 
-  .deck-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+  .stat-pill {
+    flex: 1;
     background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 0.6rem 0.85rem;
-    font-size: 0.85rem;
-    gap: 8px;
+    border-radius: 14px;
+    padding: 0.7rem 0.5rem;
+    text-align: center;
+    box-shadow: 0 3px 0 var(--shadow);
   }
 
-  .deck-item .pair {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    min-width: 0;
+  .stat-pill .num {
+    font-family: 'Fraunces', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    display: block;
+    color: var(--accent);
   }
 
-  .deck-item .pair .de {
-    font-family: 'JetBrains Mono', monospace;
+  .stat-pill .label {
+    font-size: 0.65rem;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
     font-weight: 700;
   }
 
-  .deck-item .pair .en {
-    color: var(--ink-soft);
-  }
+  /* Game/recording screen */
+  .game-screen { text-align: center; }
 
-  .deck-item .deck-actions {
-    display: flex;
+  .back-link {
+    display: inline-flex;
+    align-items: center;
     gap: 4px;
-    flex-shrink: 0;
-  }
-
-  .deck-item .deck-actions button {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--ink-soft);
     background: none;
     border: none;
     cursor: pointer;
+    padding: 0;
+    margin-bottom: 1.2rem;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .game-prompt-card {
+    background: var(--card);
+    border-radius: 24px;
+    padding: 1.6rem 1.3rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 5px 0 var(--shadow);
+  }
+
+  .game-prompt-text {
+    font-family: 'Fraunces', serif;
+    font-size: 1.3rem;
+    font-weight: 600;
+    line-height: 1.4;
+    margin: 0;
+  }
+
+  /* Game clock - playful, not exam-like */
+  .game-clock-wrap {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    margin: 0 auto 1.2rem;
+  }
+
+  .game-clock-wrap svg { transform: rotate(-90deg); }
+
+  .clock-track {
+    fill: none;
+    stroke: var(--border);
+    stroke-width: 14;
+  }
+
+  .clock-fill {
+    fill: none;
+    stroke: var(--mint);
+    stroke-width: 14;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.3s linear, stroke 0.3s;
+  }
+
+  .clock-fill.warm { stroke: var(--yellow); }
+  .clock-fill.hot { stroke: var(--coral); }
+
+  .mic-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    border: none;
+    background: var(--accent);
+    color: white;
+    font-size: 2.2rem;
+    cursor: pointer;
+    box-shadow: 0 5px 0 var(--accent-shadow);
+    transition: transform 0.1s;
+  }
+
+  .mic-button:active { transform: translate(-50%, -50%) translateY(3px); }
+
+  .mic-button.recording {
+    background: var(--mint);
+    box-shadow: 0 5px 0 #4BBE9F;
+    animation: bob 1s ease-in-out infinite;
+  }
+
+  @keyframes bob {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.06); }
+  }
+
+  .clock-label {
+    font-family: 'Fraunces', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 1.2rem;
+  }
+
+  .live-words {
+    min-height: 50px;
+    background: var(--card);
+    border-radius: 16px;
+    padding: 1rem 1.1rem;
+    font-size: 0.95rem;
     color: var(--ink-soft);
-    font-size: 14px;
-    padding: 4px;
+    margin-bottom: 1.2rem;
+    text-align: left;
+    box-shadow: 0 3px 0 var(--shadow);
+  }
+
+  .live-words.has-text { color: var(--ink); font-weight: 600; }
+
+  .mic-permission-note {
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+    background: var(--yellow-soft);
+    border-radius: 14px;
+    padding: 0.7rem 1rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .game-actions {
     display: flex;
+    gap: 10px;
+    justify-content: center;
   }
 
-  .deck-item .deck-actions button:hover {
-    color: var(--ink);
+  .btn {
+    font-family: 'Fraunces', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 14px;
+    padding: 0.75rem 1.4rem;
+    cursor: pointer;
+    transition: transform 0.1s;
   }
 
-  .deck-item .deck-actions .del:hover {
-    color: var(--red);
+  .btn:active { transform: translateY(2px); }
+
+  .btn-primary { background: var(--accent); color: white; box-shadow: 0 3px 0 var(--accent-shadow); }
+  .btn-primary:active { box-shadow: 0 1px 0 var(--accent-shadow); }
+  .btn-secondary { background: var(--card); color: var(--ink-soft); box-shadow: 0 3px 0 var(--shadow); }
+
+  /* Results: pass/fail moment */
+  .result-screen { text-align: center; }
+
+  .result-badge {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    margin: 0 auto 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
   }
 
-  .deck-empty {
+  .result-badge.pass { background: var(--mint-soft); }
+  .result-badge.fail { background: var(--coral-soft); }
+
+  .result-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1.6rem;
+    font-weight: 800;
+    margin: 0 0 0.3rem;
+  }
+
+  .result-sub {
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+    margin: 0 0 1.5rem;
+  }
+
+  .result-stats {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 1.5rem;
+  }
+
+  .result-stat {
+    flex: 1;
+    background: var(--card);
+    border-radius: 14px;
+    padding: 0.7rem 0.4rem;
+    box-shadow: 0 3px 0 var(--shadow);
+  }
+
+  .result-stat .val {
+    font-family: 'Fraunces', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+  }
+
+  .result-stat .lbl {
+    font-size: 0.62rem;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    font-weight: 700;
+  }
+
+  .transcript-box {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 1rem 1.1rem;
+    text-align: left;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 3px 0 var(--shadow);
+  }
+
+  .tb-label {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+    font-weight: 700;
+  }
+
+  .override-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .override-label {
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    margin-bottom: 0.6rem;
+    font-weight: 700;
+  }
+
+  .thumb-btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: none;
+    background: var(--card);
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 3px 0 var(--shadow);
+    transition: transform 0.1s;
+  }
+
+  .thumb-btn:active { transform: translateY(2px); }
+  .thumb-btn.selected.up { background: var(--mint-soft); box-shadow: 0 3px 0 var(--mint); }
+  .thumb-btn.selected.down { background: var(--coral-soft); box-shadow: 0 3px 0 var(--coral); }
+
+  /* History */
+  .history-item {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 0.9rem 1rem;
+    margin-bottom: 8px;
+    box-shadow: 0 3px 0 var(--shadow);
+  }
+
+  .history-top {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+    align-items: baseline;
+  }
+
+  .history-result {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
+
+  .history-result.pass { color: #3D9B82; }
+  .history-result.fail { color: #C94A3D; }
+
+  .history-meta {
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+    font-weight: 700;
+  }
+
+  .history-prompt {
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    margin: 0;
+  }
+
+  .empty-state {
     text-align: center;
     color: var(--ink-soft);
-    font-size: 0.85rem;
-    padding: 1rem;
+    font-size: 0.9rem;
+    padding: 2rem 1rem;
   }
 
-  .heatmap-wrap {
-    padding: 0.75rem 0 1rem;
-    overflow-x: auto;
-  }
-
-  .heatmap-months {
-    display: flex;
-    gap: 0;
-    margin-bottom: 4px;
-    padding-left: 0;
-  }
-
-  .heatmap-month-label {
-    font-size: 0.7rem;
-    color: var(--ink-soft);
-    flex-shrink: 0;
-  }
-
-  .heatmap-grid {
-    display: flex;
-    gap: 3px;
-  }
-
-  .heatmap-week {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-  }
-
-  .heatmap-day {
-    width: 12px;
-    height: 12px;
-    border-radius: 2px;
-    background: var(--border);
-    cursor: default;
-    position: relative;
-  }
-
-  .heatmap-day[data-count="0"] { background: var(--border); }
-  .heatmap-day[data-level="1"] { background: var(--accent-soft); border: 1px solid var(--accent); }
-  .heatmap-day[data-level="2"] { background: var(--accent); opacity: 0.5; }
-  .heatmap-day[data-level="3"] { background: var(--accent); }
-
-  .heatmap-day:hover::after {
-    content: attr(data-tip);
-    position: absolute;
-    bottom: 16px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--ink);
-    color: var(--bg);
-    font-size: 0.7rem;
-    padding: 3px 6px;
-    border-radius: 4px;
-    white-space: nowrap;
-    z-index: 10;
-    pointer-events: none;
-  }
-
-  .heatmap-legend {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    margin-top: 8px;
-    font-size: 0.7rem;
-    color: var(--ink-soft);
-  }
-
-  .legend-box {
-    width: 12px;
-    height: 12px;
-    border-radius: 2px;
-  }
-
+  /* Modals */
   .modal-overlay {
     position: fixed;
     inset: 0;
@@ -824,2063 +600,792 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 1.25rem;
-    z-index: 50;
-  }
-
-  .modal-overlay.hidden {
-    display: none;
+    padding: 1rem;
+    z-index: 1000;
   }
 
   .modal {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 1.25rem;
+    background: var(--bg);
+    border-radius: 24px;
+    padding: 1.5rem 1.3rem;
+    max-width: 380px;
     width: 100%;
-    max-width: 360px;
+    max-height: 88vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 0 var(--shadow);
   }
 
   .modal-title {
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 700;
-    font-size: 1rem;
+    font-family: 'Fraunces', serif;
+    font-size: 1.3rem;
+    font-weight: 800;
     margin: 0 0 1rem;
     color: var(--ink);
   }
 
   .modal-label {
     display: block;
-    font-size: 0.75rem;
+    font-size: 0.78rem;
+    font-weight: 700;
     color: var(--ink-soft);
-    margin: 0.75rem 0 4px;
+    margin: 1rem 0 0.4rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
   }
 
   .modal input {
     width: 100%;
     font-family: 'Inter', sans-serif;
-    font-size: 0.9rem;
-    padding: 0.6rem 0.75rem;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--bg);
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: 0.65rem 0.85rem;
+    border: none;
+    border-radius: 12px;
+    background: var(--card);
     color: var(--ink);
   }
 
-  .modal input:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-soft);
-  }
+  .modal input:focus { outline: 2px solid var(--accent); }
 
   .modal-actions {
     display: flex;
+    gap: 10px;
     justify-content: flex-end;
-    gap: 8px;
-    margin-top: 1.25rem;
-  }
-
-  .modal-actions button {
-    font-family: 'Inter', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 500;
-    border: 1px solid var(--border);
-    background: var(--card);
-    color: var(--ink);
-    border-radius: 8px;
-    padding: 0.5rem 1rem;
-    cursor: pointer;
-  }
-
-  .modal-actions button:hover {
-    border-color: var(--accent);
-  }
-
-  .modal-actions button.primary {
-    background: var(--accent);
-    color: var(--btn-text);
-    border: none;
-  }
-
-  .modal-actions button.primary:hover {
-    background: var(--btn-hover);
-  }
-
-  .quiz-modal { max-width: 420px; }
-
-  .quiz-question {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 1.3rem;
-    font-weight: 700;
-    text-align: center;
-    margin: 0.5rem 0 1.25rem;
-  }
-
-  .quiz-options {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-bottom: 1rem;
-  }
-
-  .quiz-option {
-    font-family: 'Inter', sans-serif;
-    font-size: 0.9rem;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    color: var(--ink);
-    border-radius: 8px;
-    padding: 0.7rem 0.5rem;
-    cursor: pointer;
-    text-align: center;
-    transition: background 0.15s;
-  }
-
-  .quiz-option:hover { background: var(--accent-soft); border-color: var(--accent); }
-  .quiz-option.correct { background: var(--gold-soft); border-color: var(--gold); color: var(--ink); }
-  .quiz-option.wrong { background: var(--red-soft); border-color: var(--red); color: var(--ink); }
-  .quiz-option:disabled { cursor: default; }
-
-  .quiz-result {
-    text-align: center;
-    font-size: 0.9rem;
-    font-weight: 600;
-    margin: 0;
-  }
-
-  .quiz-result.correct-msg { color: var(--gold); }
-  .quiz-result.wrong-msg { color: var(--red); }
-
-  .challenge-profile-list {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    margin: 0.5rem 0 1rem;
-  }
-
-  .challenge-profile-list button {
-    font-family: 'Inter', sans-serif;
-    font-size: 0.9rem;
-    text-align: left;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    color: var(--ink);
-    border-radius: 8px;
-    padding: 0.6rem 0.85rem;
-    cursor: pointer;
-  }
-
-  .challenge-profile-list button:hover {
-    border-color: var(--accent);
-    background: var(--accent-soft);
-  }
-
-  .challenge-waiting {
-    text-align: center;
-    padding: 1rem 0;
-    color: var(--ink-soft);
-    font-size: 0.9rem;
-  }
-
-  .challenge-card {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 1.4rem;
-    font-weight: 700;
-    text-align: center;
-    margin: 0.5rem 0 1.25rem;
+    margin-top: 1.3rem;
   }
 
   .profile-list {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    margin-bottom: 1rem;
+    gap: 8px;
+    margin-bottom: 0.5rem;
   }
 
   .profile-list-row {
     display: flex;
-    align-items: center;
-    gap: 6px;
+    gap: 8px;
   }
 
   .profile-pick-btn {
     flex: 1;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.9rem;
-    font-weight: 500;
-    text-align: left;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    color: var(--ink);
-    border-radius: 8px;
-    padding: 0.6rem 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Fraunces', serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    background: var(--card);
+    border: none;
+    border-radius: 14px;
+    padding: 0.7rem 0.9rem;
     cursor: pointer;
-  }
-
-  .profile-pick-btn:hover {
-    border-color: var(--accent);
-    background: var(--accent-soft);
+    color: var(--ink);
+    text-align: left;
+    box-shadow: 0 2px 0 var(--shadow);
   }
 
   .profile-edit-icon {
-    background: none;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 0.6rem;
+    background: var(--card);
+    border: none;
+    border-radius: 14px;
+    width: 42px;
     cursor: pointer;
-    color: var(--ink-soft);
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    flex-shrink: 0;
-  }
-
-  .profile-edit-icon:hover {
-    border-color: var(--accent);
-    color: var(--ink);
-  }
-
-  .profile-list button .avatar-chip {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    font-size: 13px;
-    margin-right: 8px;
-    vertical-align: middle;
+    box-shadow: 0 2px 0 var(--shadow);
   }
 
   .avatar-picker {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
-    margin: 6px 0 0.5rem;
+    gap: 8px;
   }
 
   .avatar-picker button {
-    width: 32px;
-    height: 32px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     border: 2px solid transparent;
-    background: var(--bg);
-    font-size: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: var(--card);
+    font-size: 1.1rem;
     cursor: pointer;
-    padding: 0;
+    box-shadow: 0 2px 0 var(--shadow);
   }
 
   .avatar-picker button.selected {
     border-color: var(--accent);
   }
 
-  /* Basic mode hides fun-only elements */
-  body.basic-mode .fun-only {
-    display: none !important;
+  .avatar-chip {
+    font-size: 1rem;
   }
 
-  body.no-grading-profile .grading-only {
-    display: none !important;
-  }
-
-  body:not(.basic-mode) #basicDeckPicker {
-    display: none !important;
-  }
-
-  .basic-deck-picker {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 1rem;
-  }
-
-  .basic-deck-btn {
-    flex: 1;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 500;
-    border: 1px solid var(--border);
-    background: var(--card);
+  footer {
+    margin-top: 1.5rem;
+    text-align: center;
+    font-size: 0.75rem;
     color: var(--ink-soft);
-    border-radius: 8px;
-    padding: 0.6rem;
-    cursor: pointer;
-    transition: all 0.15s;
   }
 
-  .basic-deck-btn.active {
-    background: var(--accent);
-    color: var(--btn-text);
-    border-color: var(--accent);
-    font-weight: 600;
-  }
+  .hidden { display: none !important; }
 
-  .basic-deck-btn:not(.active):hover {
-    border-color: var(--accent);
-    color: var(--ink);
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .flip-inner { transition: none; }
-  }
-
-  @media (max-width: 480px) {
-    body { padding: 1.5rem 0.75rem; }
-    h1 { font-size: 1.25rem; }
-    .card-zone, .flip-card, .flip-inner { height: 220px; }
-    .face .word { font-size: 1.4rem; }
-    .add-form { flex-direction: column; }
-    .add-form input { font-size: 16px; padding: 0.75rem; }
-    .add-form button { padding: 0.75rem 1.1rem; }
-    .grade-row { height: 48px; }
-    .grade-row button { font-size: 0.85rem; }
-    .stat-value { font-size: 1.2rem; }
-    .stat-label { font-size: 0.65rem; }
+  @media (max-width: 420px) {
+    .challenge-prompt, .game-prompt-text { font-size: 1.15rem; }
+    .game-clock-wrap { width: 180px; height: 180px; }
   }
 </style>
 </head>
 <body>
 <main>
-  <header>
-    <div>
-      <h1>vokabel<span>karten</span></h1>
-      <p class="subtitle"><span id="profileLabel"></span> &middot; <a href="#" id="switchProfileLink">switch</a></p>
+
+  <!-- HOME SCREEN -->
+  <div id="homeScreen">
+    <header>
+      <div>
+        <h1>sprech<span>en</span></h1>
+        <p class="profile-subtitle"><span id="profileLabel"></span> &middot; <a href="#" id="switchProfileLink">switch</a></p>
+      </div>
+      <div class="header-actions">
+        <button class="icon-toggle" id="darkModeToggle" title="Toggle dark mode">🌙</button>
+        <button class="icon-toggle" id="historyLink" title="History">📋</button>
+      </div>
+    </header>
+
+    <div class="level-tabs" id="levelTabs"></div>
+
+    <div class="ladder-wrap">
+      <p class="ladder-title" id="ladderTitle">Your ladder</p>
+      <div class="ladder-rungs" id="ladderRungs"></div>
     </div>
-    <div class="header-actions">
-      <button id="modeToggle" class="mode-toggle-btn" title="Switch mode" aria-label="Switch between Basic and Fun mode">
-        <span id="modeToggleLabel">Basic</span>
-      </button>
-      <button id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark mode">
-        <div class="inner-box"></div>
-      </button>
+
+    <div class="challenge-card" id="challengeCard">
+      <span class="challenge-rung-badge" id="challengeRungBadge"></span>
+      <p class="challenge-prompt" id="challengePromptText"></p>
+      <button class="play-btn" id="playBtn">▶ Speak now</button>
+      <button class="skip-link" id="skipPromptBtn">Show a different one</button>
     </div>
-  </header>
 
-  <!-- Word of the day -->
-  <div id="wordOfDay" class="word-of-day hidden fun-only">
-    <span class="wod-label">Word of the day</span>
-    <span id="wodFront" class="wod-word"></span>
-    <span id="wodBack" class="wod-back"></span>
+    <div class="stats-strip" id="statsStrip"></div>
+
+    <footer>Made with ☕ and ❤️ — Yogitha</footer>
   </div>
 
-  <!-- Mode toggles -->
-  <div class="mode-toggles fun-only">
-    <button id="reverseModeBtn" class="mode-btn" title="Reverse mode: English → German">⇄ Reverse</button>
-    <button id="typeModeBtn" class="mode-btn grading-only" title="Typing mode">⌨ Type</button>
-    <button id="masteredBtn" class="mode-btn grading-only" title="Practice mastered cards">⭐ Mastered</button>
-    <button id="historyBtn" class="mode-btn" title="Challenge history">📋 History</button>
-  </div>
+  <!-- GAME SCREEN -->
+  <div id="gameScreen" class="game-screen hidden">
+    <button class="back-link" id="exitGameBtn">← Back</button>
 
-  <!-- 1. Flashcard — main focus -->
-  <div class="card-zone" id="cardZone">
-    <div class="empty-state">Loading your deck&hellip;</div>
-  </div>
+    <div class="game-prompt-card">
+      <p class="game-prompt-text" id="gamePromptText"></p>
+    </div>
 
-  <!-- 2. Grade buttons — immediately under card (fun mode only) -->
-  <div class="grade-row hidden fun-only" id="gradeRow">
-    <button data-q="1">Hard</button>
-    <button data-q="2">Moderate</button>
-    <button data-q="3">Easy</button>
-  </div>
+    <div class="mic-permission-note hidden" id="micNote">
+      🎙️ This needs mic access to hear you. Your browser will ask permission.
+    </div>
 
-  <!-- Typing mode input -->
-  <div id="typeInputRow" class="hidden fun-only" style="display:none;">
-    <form id="typeForm" style="display:flex;gap:8px;margin-bottom:0.75rem;">
-      <input id="typeInput" autocomplete="off" placeholder="Type the answer…" style="flex:1;font-family:'Inter',sans-serif;font-size:0.9rem;padding:0.6rem 0.75rem;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--ink);" />
-      <button type="submit" style="font-family:'JetBrains Mono',monospace;font-size:0.85rem;font-weight:700;background:var(--accent);color:var(--btn-text);border:none;border-radius:8px;padding:0 1rem;cursor:pointer;">Check</button>
-    </form>
-    <p id="typeResult" class="hidden" style="font-size:0.9rem;font-weight:600;text-align:center;margin:0 0 0.75rem;"></p>
-  </div>
+    <div class="game-clock-wrap">
+      <svg width="200" height="200" viewBox="0 0 200 200">
+        <circle class="clock-track" cx="100" cy="100" r="86"></circle>
+        <circle class="clock-fill" id="clockFill" cx="100" cy="100" r="86"
+          stroke-dasharray="540" stroke-dashoffset="0"></circle>
+      </svg>
+      <button class="mic-button" id="micBtn">🎤</button>
+    </div>
+    <p class="clock-label" id="clockLabel">0:00</p>
 
-  <!-- 3. Secondary actions row -->
-  <div class="toolbar fun-only" style="margin-bottom:0.75rem;">
-    <button id="shuffleBtn" title="Shuffle deck order">
-      <i class="ti ti-arrows-shuffle" aria-hidden="true"></i> Shuffle
-    </button>
-    <button id="quizBtn" class="grading-only" title="Quiz mode">
-      <i class="ti ti-help" aria-hidden="true"></i> Quiz
-    </button>
-    <button id="challengeBtn" class="grading-only" title="Challenge a friend" style="position:relative;">
-      <i class="ti ti-bolt" aria-hidden="true"></i> Challenge
-      <span id="challengeBadge" style="display:none;position:absolute;top:-6px;right:-6px;background:var(--red);color:#fff;font-size:10px;font-weight:700;border-radius:999px;min-width:16px;height:16px;line-height:16px;text-align:center;padding:0 3px;"></span>
-    </button>
-    <div class="toolbar-group grading-only">
-      <span class="toolbar-label">Send to deck:</span>
-      <button data-send="1">Hard</button>
-      <button data-send="2">Moderate</button>
-      <button data-send="3">Easy</button>
+    <div class="live-words" id="liveWords">Tap the mic and start talking…</div>
+
+    <div class="game-actions">
+      <button class="btn btn-secondary hidden" id="discardBtn">Restart</button>
+      <button class="btn btn-primary hidden" id="finishBtn">Done!</button>
     </div>
   </div>
 
-  <!-- Basic mode: deck picker -->
-  <div id="basicDeckPicker" class="basic-deck-picker">
-    <button id="basicMyDeckBtn" class="basic-deck-btn active">My deck</button>
-    <button id="basicAllBtn" class="basic-deck-btn">Everyone's deck</button>
-  </div>
+  <!-- RESULT SCREEN -->
+  <div id="resultScreen" class="result-screen hidden">
+    <button class="back-link" id="resultBackBtn">← Back</button>
 
-  <!-- 5. Add a card (Fun mode only) -->
-  <form class="add-form fun-only" id="addForm">
-    <input id="frontInput" placeholder="German word" autocomplete="off" required />
-    <input id="backInput" placeholder="English meaning" autocomplete="off" required />
-    <button type="submit" id="addBtn">Add</button>
-  </form>
-  <input id="exampleInput" class="example-input fun-only" placeholder="Example sentence (optional)" autocomplete="off" />
-  <input id="notesInput" class="example-input fun-only" placeholder="Notes (e.g. die, plural: Häuser)" autocomplete="off" />
-  <p class="status-line" id="statusLine"></p>
+    <div id="resultBadge" class="result-badge"></div>
+    <p class="result-title" id="resultTitle"></p>
+    <p class="result-sub" id="resultSub"></p>
 
-  <hr class="fun-only" style="border:none;border-top:1px solid var(--border);margin:0.5rem 0 0.75rem;">
+    <div class="result-stats" id="resultStats"></div>
 
-  <!-- 6. Stats -->
-  <div class="stats fun-only" style="grid-template-columns:repeat(4,1fr);">
-    <div class="stat due">
-      <p class="stat-label">Practiced</p>
-      <p class="stat-value" id="dueCount">0</p>
+    <div class="transcript-box">
+      <p class="tb-label">What you said</p>
+      <p id="resultTranscript"></p>
     </div>
-    <div class="stat">
-      <p class="stat-label">Deck</p>
-      <p class="stat-value" id="totalCount">0</p>
+
+    <p class="override-label">You be the judge</p>
+    <div class="override-row" id="overrideRow">
+      <button class="thumb-btn down" data-pass="false">👎</button>
+      <button class="thumb-btn up" data-pass="true">👍</button>
     </div>
-    <div class="stat">
-      <p class="stat-label">Streak</p>
-      <p class="stat-value" id="streakCount">0</p>
-    </div>
-    <div class="stat grading-only">
-      <p class="stat-label">Mastered</p>
-      <p class="stat-value" id="masteredCount">0</p>
+
+    <div class="game-actions">
+      <button class="btn btn-secondary" id="retryBtn">Try again</button>
+      <button class="btn btn-primary" id="nextBtn">Next prompt →</button>
     </div>
   </div>
 
-  <!-- 6. Your deck (collapsed) -->
-  <button class="section-toggle fun-only" id="deckToggle" type="button">
-    <i class="ti ti-chevron-down" aria-hidden="true"></i> Your deck
-  </button>
-  <div class="deck-section hidden fun-only" id="deckSection">
-    <input id="deckSearch" class="example-input" placeholder="Search German or English..." autocomplete="off" />
-    <div class="deck-list" id="deckList"></div>
+  <!-- HISTORY SCREEN -->
+  <div id="historyScreen" class="hidden">
+    <button class="back-link" id="historyBackBtn">← Back</button>
+    <h1 style="font-size:1.4rem; margin-bottom:1rem;">Your sessions</h1>
+    <div id="historyList"></div>
   </div>
 
-  <!-- 7. Activity (collapsed) -->
-  <button class="section-toggle fun-only" id="chartToggle" type="button">
-    <i class="ti ti-chevron-down" aria-hidden="true"></i> Activity
-  </button>
-  <div class="deck-section hidden fun-only" id="chartSection">
-    <div class="heatmap-wrap">
-      <div class="heatmap-months" id="heatmapMonths"></div>
-      <div class="heatmap-grid" id="heatmapGrid"></div>
-      <div class="heatmap-legend">
-        <span>Less</span>
-        <div class="legend-box" style="background:var(--border)"></div>
-        <div class="legend-box" style="background:var(--accent-soft)"></div>
-        <div class="legend-box" style="background:var(--accent); opacity:0.5"></div>
-        <div class="legend-box" style="background:var(--accent)"></div>
-        <span>More</span>
+  <!-- PROFILE PICKER MODAL -->
+  <div class="modal-overlay hidden" id="profileOverlay">
+    <div class="modal">
+      <p class="modal-title">Who's playing?</p>
+      <div class="profile-list" id="profileList"></div>
+      <label class="modal-label" for="newProfileInput">Or add a new name</label>
+      <input id="newProfileInput" autocomplete="off" placeholder="Your name" />
+      <label class="modal-label">Pick an avatar</label>
+      <div class="avatar-picker" id="emojiPicker"></div>
+      <label class="modal-label">Pick a color</label>
+      <div class="avatar-picker" id="colorPicker"></div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" id="profileGoBtn" type="button">Let's go</button>
       </div>
     </div>
   </div>
 
-  <button id="iosInstallBtn" class="ios-install-btn hidden">
-    <i class="ti ti-download" aria-hidden="true"></i> Add to Home Screen
-  </button>
-  <footer>Made with ☕ and ❤️ — Yogitha</footer>
+  <!-- EDIT PROFILE MODAL -->
+  <div class="modal-overlay hidden" id="editProfileOverlay">
+    <div class="modal">
+      <p class="modal-title">Edit profile</p>
+      <label class="modal-label" for="editProfileName">Name</label>
+      <input id="editProfileName" autocomplete="off" />
+      <label class="modal-label">Avatar</label>
+      <div class="avatar-picker" id="editEmojiPicker"></div>
+      <label class="modal-label">Color</label>
+      <div class="avatar-picker" id="editColorPicker"></div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="editProfileCancelBtn" type="button">Cancel</button>
+        <button class="btn btn-primary" id="editProfileSaveBtn" type="button">Save</button>
+      </div>
+    </div>
+  </div>
+
 </main>
-
-<div class="modal-overlay hidden" id="profileOverlay">
-  <div class="modal">
-    <p class="modal-title">Who's practicing?</p>
-    <div class="profile-list" id="profileList"></div>
-    <label class="modal-label" for="newProfileInput">Or add a new name</label>
-    <input id="newProfileInput" autocomplete="off" placeholder="Your name" />
-    <label class="modal-label">Pick an avatar</label>
-    <div class="avatar-picker" id="emojiPicker"></div>
-    <label class="modal-label">Pick a theme color</label>
-    <div class="avatar-picker" id="colorPicker"></div>
-    <div class="modal-actions">
-      <button id="profileGoBtn" type="button" class="primary">Continue</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay hidden" id="editProfileOverlay">
-  <div class="modal">
-    <p class="modal-title">Edit profile</p>
-    <label class="modal-label" for="editProfileName">Name</label>
-    <input id="editProfileName" autocomplete="off" />
-    <label class="modal-label">Avatar</label>
-    <div class="avatar-picker" id="editEmojiPicker"></div>
-    <label class="modal-label">Theme color</label>
-    <div class="avatar-picker" id="editColorPicker"></div>
-    <div class="modal-actions">
-      <button id="editProfileCancelBtn" type="button">Cancel</button>
-      <button id="editProfileSaveBtn" type="button" class="primary">Save</button>
-    </div>
-  </div>
-</div>
-
-<!-- Quiz modal -->
-<div class="modal-overlay hidden" id="quizOverlay">
-  <div class="modal quiz-modal">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
-      <p class="modal-title" style="margin:0;">Quiz mode</p>
-      <span id="quizProgress" style="font-size:0.8rem;color:var(--ink-soft);"></span>
-    </div>
-    <div id="quizSizePicker" style="display:none;">
-      <p style="font-size:0.9rem;color:var(--ink-soft);margin:0 0 0.75rem;">How many cards?</p>
-      <div class="quiz-options" id="quizSizeOptions"></div>
-    </div>
-    <div id="quizCardArea">
-      <p class="quiz-question" id="quizQuestion"></p>
-      <div class="quiz-options" id="quizOptions"></div>
-      <p class="quiz-result hidden" id="quizResult"></p>
-      <div id="quizAddToDeck" style="display:none; margin-top:8px; text-align:center;"></div>
-    </div>
-    <div class="modal-actions">
-      <button id="quizCloseBtn" type="button">Close</button>
-      <button id="quizNextBtn" type="button" class="primary hidden">Next</button>
-    </div>
-  </div>
-</div>
-
-<!-- Challenge modal -->
-<div class="modal-overlay hidden" id="challengeOverlay">
-  <div class="modal">
-    <p class="modal-title" id="challengeTitle">Challenge a friend</p>
-    <div id="challengeBody"></div>
-    <div class="modal-actions">
-      <button id="challengeCloseBtn" type="button">Close</button>
-    </div>
-  </div>
-</div>
-
-<!-- All done overlay -->
-<div class="modal-overlay hidden" id="allDoneOverlay">
-  <div class="modal" style="text-align:center;">
-    <p style="font-size:2rem; margin:0 0 8px;">🎉</p>
-    <p class="modal-title">You practiced everything!</p>
-    <p style="font-size:0.9rem; color:var(--ink-soft); margin:0 0 1.5rem;">Great session. Shuffle and go again?</p>
-    <div class="modal-actions" style="justify-content:center;">
-      <button id="allDoneCloseBtn" type="button">Not now</button>
-      <button id="allDoneShuffleBtn" type="button" class="primary">Shuffle &amp; restart</button>
-    </div>
-  </div>
-</div>
-
-<!-- Confetti canvas -->
-<canvas id="confettiCanvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;"></canvas>
-
-<!-- Mastered card celebration -->
-<div class="modal-overlay hidden" id="masteredOverlay">
-  <div class="modal" style="text-align:center;">
-    <p style="font-size:2rem; margin:0 0 8px;">🎉</p>
-    <p class="modal-title" id="masteredTitle">Card mastered!</p>
-    <p style="font-size:0.9rem; color:var(--ink-soft); margin:0 0 1.5rem;" id="masteredWord"></p>
-    <div class="modal-actions" style="justify-content:center;">
-      <button id="masteredOkBtn" type="button" class="primary">Keep going!</button>
-    </div>
-  </div>
-</div>
-
-<!-- Challenge history modal -->
-<div class="modal-overlay hidden" id="historyOverlay">
-  <div class="modal">
-    <p class="modal-title">Challenge history</p>
-    <div id="historyBody" style="max-height:300px;overflow-y:auto;"></div>
-    <div class="modal-actions">
-      <button id="historyCloseBtn" type="button" class="primary">Close</button>
-    </div>
-  </div>
-</div>
-
-
-<div class="modal-overlay hidden" id="editOverlay">
-  <div class="modal">
-    <p class="modal-title">Edit card</p>
-    <label class="modal-label" for="editFront">German</label>
-    <input id="editFront" autocomplete="off" />
-    <label class="modal-label" for="editBack">English</label>
-    <input id="editBack" autocomplete="off" />
-    <label class="modal-label" for="editExample">Example sentence (optional)</label>
-    <input id="editExample" autocomplete="off" placeholder="e.g. Ich trinke Wasser." />
-    <label class="modal-label" for="editNotes">Notes (optional)</label>
-    <input id="editNotes" autocomplete="off" placeholder="e.g. die, plural: Häuser" />
-    <div class="modal-actions">
-      <button id="editCancelBtn" type="button">Cancel</button>
-      <button id="editSaveBtn" type="button" class="primary">Save</button>
-    </div>
-  </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const SUPABASE_URL = 'https://fthbysugxtuumkgsaful.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0aGJ5c3VneHR1dW1rZ3NhZnVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzMzc4NjksImV4cCI6MjA5NjkxMzg2OX0.wDI6EcWauFbTxQVnmoHXE7Y4xPO9EYUR_ZjZf-WkNH0';
+const PROMPT_BANK = {
+  A1: {
+    color: '#6FE3C4',
+    rungs: {
+      1: ["Wie heißt du?","Wie alt bist du?","Woher kommst du?","Was isst du gern?","Magst du Kaffee oder Tee?"],
+      2: ["Was machst du am Morgen?","Wo wohnst du?","Hast du Geschwister?","Was ist dein Lieblingstier?","Welche Farbe magst du am liebsten?"],
+      3: ["Beschreibe deine Familie kurz.","Was machst du am Wochenende?","Was isst du normalerweise zum Frühstück?","Welche Sprachen sprichst du?","Wie kommst du zur Arbeit oder zur Schule?"],
+      4: ["Was sind deine Hobbys?","Beschreibe dein Zimmer.","Wie ist das Wetter heute?","Was machst du, wenn es regnet?","Erzähl von deinem Lieblingstag der Woche."],
+      5: ["Beschreibe deinen Tagesablauf von morgens bis abends.","Erzähl etwas über deine beste Freundin oder deinen besten Freund.","Was machst du gern in deiner Freizeit, und warum?","Beschreibe dein Lieblingsessen und wie man es macht."]
+    }
+  },
+  A2: {
+    color: '#FFC857',
+    rungs: {
+      1: ["Was hast du gestern gemacht?","Wohin fährst du gern im Urlaub?","Was machst du, um gesund zu bleiben?","Was kaufst du oft im Supermarkt?","Wie war dein letztes Wochenende?"],
+      2: ["Erzähl von deiner letzten Reise.","Beschreibe deine Traumwohnung.","Was gefällt dir an deiner Stadt?","Wie oft treibst du Sport, und welchen?","Was machst du, wenn du dich krank fühlst?"],
+      3: ["Beschreibe einen typischen Arbeitstag.","Erzähl von einem Einkauf, der schiefgegangen ist.","Möchtest du lieber in der Stadt oder auf dem Land wohnen? Warum?","Wie hast du Deutsch gelernt?","Was war dein schönstes Reiseerlebnis?"],
+      4: ["Erzähl von einem besonderen Tag in deinem Leben.","Was gefällt dir an deinem Job oder Studium, was nicht?","Hattest du schon mal einen schwierigen Tag bei der Arbeit? Erzähl davon.","Wie war deine Wohnung, als du ein Kind warst?","Was würdest du an deiner aktuellen Wohnung ändern?"],
+      5: ["Was war die größte Veränderung in deinem Leben in den letzten Jahren?","Erzähl eine Geschichte von einer Reise, die nicht wie geplant lief.","Beschreibe, wie sich dein Alltag in den letzten Jahren verändert hat.","Vergleiche dein Leben jetzt mit deinem Leben vor fünf Jahren."]
+    }
+  },
+  B1: {
+    color: '#FF6B5B',
+    rungs: {
+      1: ["Was hältst du von sozialen Medien?","Isst du gern vegetarisch? Warum oder warum nicht?","Was ist wichtiger: Geld oder Zeit? Warum?","Magst du es, neue Leute kennenzulernen?","Was denkst du über Homeoffice?"],
+      2: ["Was sind die Vor- und Nachteile, in einer Großstadt zu leben?","Sollten Handys in Schulen verboten werden? Begründe deine Meinung.","Wie wichtig ist Recycling in deinem Alltag?","Was kann man persönlich tun, um die Umwelt zu schützen?","Reist du lieber allein oder mit anderen? Warum?"],
+      3: ["Wo siehst du dich in fünf Jahren?","Was denkst du über den Klimawandel?","Sollte man weniger Fleisch essen? Diskutiere kurz.","Ist es wichtiger, glücklich zu sein oder erfolgreich? Warum?","Diskutiere die Vor- und Nachteile vom Online-Lernen."],
+      4: ["Erzähl von einer Entscheidung, die dein Leben verändert hat.","Beschreibe eine Situation, in der du eine schwierige Entscheidung treffen musstest.","Wie hat sich die Gesellschaft in den letzten zehn Jahren verändert?","Was war die größte Herausforderung, die du je gemeistert hast?","Erzähl von einem Missverständnis, das du mal hattest."],
+      5: ["Manche meinen, Tests in der Schule seien unnötig. Was denkst du, und warum?","Ist es besser, in einer Beziehung die gleichen Interessen zu haben oder unterschiedliche? Begründe.","Sollte man immer die Wahrheit sagen, auch wenn sie weh tut? Diskutiere beide Seiten.","Erzähl eine Geschichte über jemanden, der dich inspiriert hat, und warum."]
+    }
+  }
+};
 
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const RUNG_COUNT = 5;
+const TIME_PER_RUNG = { 1: 30, 2: 40, 3: 50, 4: 65, 5: 80 };
 
-const DAY = 86400000;
+// ── State ─────────────────────────────────────────────────
+const EMOJI_OPTIONS = ['🦕','🦖','🐉','🦴','🥚','🌋','🍃','🦎'];
+const THEME_COLORS = ['#0B4D2E','#3A2E5C','#5C2E2E','#1F4B4B','#5C3D1F','#2E3B5C','#4B2E5C','#1F3D2E'];
 
-let cards = [];
-let currentCard = null;
-let flipped = false;
-let practiceFilter = null;
-let dueQueue = [];
-let profile = '';
+let profile = null;
+let currentAvatar = { emoji: null, color: null };
+let selectedEmoji = EMOJI_OPTIONS[0];
+let selectedColor = THEME_COLORS[0];
 
-function now() { return Date.now(); }
+let currentLevel = 'A1';
+let currentPrompt = null;
+let currentRung = 1;
+let recognition = null;
+let isRecording = false;
+let finalTranscript = '';
+let interimTranscript = '';
+let sessionStartTime = null;
+let timerInterval = null;
+let elapsedSeconds = 0;
+let lastResult = null;
+
+function profileKey(suffix) {
+  return `spiel-${suffix}-${profile}`;
+}
+
+function getKnownProfiles() {
+  try { return JSON.parse(localStorage.getItem('spiel-profiles') || '[]'); }
+  catch (e) { return []; }
+}
+function saveKnownProfiles(list) {
+  localStorage.setItem('spiel-profiles', JSON.stringify(list));
+}
+function upsertKnownProfile(name, emoji, color) {
+  const list = getKnownProfiles();
+  const idx = list.findIndex(p => p.name === name);
+  const entry = { name, emoji, color };
+  if (idx >= 0) list[idx] = entry; else list.push(entry);
+  saveKnownProfiles(list);
+}
+
+function getLadder() {
+  try { return JSON.parse(localStorage.getItem(profileKey('ladder')) || '{}'); }
+  catch (e) { return {}; }
+}
+function saveLadder(ladder) {
+  localStorage.setItem(profileKey('ladder'), JSON.stringify(ladder));
+}
+function getRungFor(level) {
+  const ladder = getLadder();
+  return ladder[level] || 1;
+}
+function setRungFor(level, rung) {
+  const ladder = getLadder();
+  ladder[level] = Math.max(1, Math.min(RUNG_COUNT, rung));
+  saveLadder(ladder);
+}
+
+function getHistory() {
+  try { return JSON.parse(localStorage.getItem(profileKey('history')) || '[]'); }
+  catch (e) { return []; }
+}
+function saveHistoryEntry(entry) {
+  const h = getHistory();
+  h.unshift(entry);
+  localStorage.setItem(profileKey('history'), JSON.stringify(h.slice(0, 200)));
+}
+
+function applyProfileTheme(color) {
+  if (!color) return;
+  document.documentElement.style.setProperty('--accent', color);
+  document.documentElement.style.setProperty('--accent-soft', color + '33');
+  document.documentElement.style.setProperty('--accent-shadow', color);
+}
+
+function avatarChip(emoji) {
+  return `<span class="avatar-chip">${emoji || ''}</span>`;
+}
 
 function escapeHtml(s) {
-  return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
 }
 
-function speak(text) {
-  if (!('speechSynthesis' in window)) return;
-  window.speechSynthesis.cancel();
-  const utter = new SpeechSynthesisUtterance(text);
-  utter.lang = 'de-DE';
-  window.speechSynthesis.speak(utter);
-}
-
-function todayStr() {
-  const d = new Date();
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
-  return `${yyyy}-${mm}-${dd}`;
-}
-
-function daysBetween(a, b) {
-  const d1 = new Date(a);
-  const d2 = new Date(b);
-  return Math.round((d2 - d1) / 86400000);
-}
-
-let streakValue = 0;
-
-async function fetchStreak() {
-  const { data, error } = await sb.from('streaks').select('*').eq('profile', profile).maybeSingle();
-  if (error) return;
-  streakValue = data ? (data.current_streak || 0) : 0;
-  document.getElementById('streakCount').textContent = streakValue;
-}
-
-async function recordPracticeToday() {
-  const { data } = await sb.from('streaks').select('*').eq('profile', profile).maybeSingle();
-  const today = todayStr();
-  const last = data ? data.last_practiced_date : null;
-  let nextStreak = data ? (data.current_streak || 0) : 0;
-  if (last === today) return;
-  if (last && daysBetween(last, today) === 1) {
-    nextStreak = nextStreak + 1;
-  } else {
-    nextStreak = 1;
-  }
-  const { error: updErr } = await sb.from('streaks').upsert({
-    profile, current_streak: nextStreak, last_practiced_date: today
+function show(id) {
+  ['homeScreen','gameScreen','resultScreen','historyScreen'].forEach(s => {
+    document.getElementById(s).classList.toggle('hidden', s !== id);
   });
-  if (!updErr) {
-    streakValue = nextStreak;
-    document.getElementById('streakCount').textContent = streakValue;
-  }
 }
 
-function setStatus(msg, isError) {
-  const el = document.getElementById('statusLine');
-  el.textContent = msg || '';
-  el.classList.toggle('error', !!isError);
+function pickPrompt(level, rung) {
+  const options = PROMPT_BANK[level].rungs[rung];
+  return options[Math.floor(Math.random() * options.length)];
 }
 
-async function fetchCards() {
-  const { data, error } = await sb.from('cards').select('*').eq('profile', profile).order('due', { ascending: true });
-  if (error) {
-    setStatus('Could not load cards: ' + error.message, true);
-    return [];
-  }
-  return data;
-}
-
-function getDueCards() {
-  return cards.filter(c => !c.mastered && c.due <= now());
-}
-
-function getPracticedCards() {
-  return cards.filter(c => c.reps > 0);
-}
-
-function shuffleArray(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-function pickCard() {
-  const due = getDueCards();
-  if (due.length === 0) {
-    dueQueue = [];
-    return null;
-  }
-  dueQueue = dueQueue.filter(id => due.some(c => c.id === id));
-  due.forEach(c => { if (!dueQueue.includes(c.id)) dueQueue.push(c.id); });
-  if (dueQueue.length === 0) return null;
-  const nextId = dueQueue[0];
-  return cards.find(c => c.id === nextId) || null;
-}
-
-async function addCard(front, back, example, notes) {
-  const duplicate = cards.find(c =>
-    c.front.trim().toLowerCase() === front.trim().toLowerCase() &&
-    c.back.trim().toLowerCase() === back.trim().toLowerCase()
-  );
-  if (duplicate) {
-    const addBtn = document.getElementById('addBtn');
-    addBtn.disabled = false;
-    setStatus(`"${front}" already exists in your deck.`, true);
-    return;
-  }
-  const addBtn = document.getElementById('addBtn');
-  addBtn.disabled = true;
-  setStatus('Saving...');
-  const { data, error } = await sb.from('cards').insert({
-    front, back, interval: 0, due: now(), reps: 0, profile, example: example || null, notes: notes || null
-  }).select();
-  addBtn.disabled = false;
-  if (error) {
-    setStatus('Could not save: ' + error.message, true);
-    return;
-  }
-  cards.push(data[0]);
-  checkMilestone(cards.length);
-  setStatus('Saved.');
-  render();
-}
-
-async function deleteCard(id) {
-  const { error } = await sb.from('cards').delete().eq('id', id);
-  if (error) {
-    setStatus('Could not delete: ' + error.message, true);
-    return;
-  }
-  cards = cards.filter(c => String(c.id) !== String(id));
-  if (currentCard && String(currentCard.id) === String(id)) {
-    currentCard = null;
-    flipped = false;
-  }
-  render();
-}
-
-let editingCard = null;
-
-function openEditModal(card) {
-  editingCard = card;
-  document.getElementById('editFront').value = card.front;
-  document.getElementById('editBack').value = card.back;
-  document.getElementById('editExample').value = card.example || '';
-  document.getElementById('editNotes').value = card.notes || '';
-  document.getElementById('editOverlay').classList.remove('hidden');
-}
-
-function closeEditModal() {
-  editingCard = null;
-  document.getElementById('editOverlay').classList.add('hidden');
-}
-
-async function saveEditedCard() {
-  if (!editingCard) return;
-  const front = document.getElementById('editFront').value.trim();
-  const back = document.getElementById('editBack').value.trim();
-  const example = document.getElementById('editExample').value.trim();
-  const notes = document.getElementById('editNotes').value.trim();
-  if (!front || !back) return;
-  const { error } = await sb.from('cards').update({ front, back, example: example || null, notes: notes || null }).eq('id', editingCard.id);
-  if (error) {
-    setStatus('Could not save edit: ' + error.message, true);
-    return;
-  }
-  editingCard.front = front;
-  editingCard.back = back;
-  editingCard.example = example || null;
-  editingCard.notes = notes || null;
-  closeEditModal();
-  setStatus('Card updated.');
-  render();
-}
-
-async function grade(card, quality) {
-  card.reps += 1;
-  let base;
-  if (card.interval === 0) base = 1;
-  else if (card.interval === 1) base = quality === 1 ? 1 : (quality === 2 ? 3 : 4);
-  else base = card.interval * (quality === 1 ? 1.3 : quality === 2 ? 2.2 : 3);
-  card.interval = Math.max(1, Math.round(base));
-  card.due = now() + card.interval * DAY;
-  card.lastQuality = quality;
-
-  // Mastery tracking
-  if (quality === 3) {
-    card.correct_streak = (card.correct_streak || 0) + 1;
-  } else {
-    card.correct_streak = 0;
-  }
-  const justMastered = !card.mastered && card.correct_streak >= 10;
-  if (justMastered) card.mastered = true;
-
-  const { error } = await sb.from('cards').update({
-    interval: card.interval, due: card.due, reps: card.reps,
-    correct_streak: card.correct_streak, mastered: card.mastered
-  }).eq('id', card.id);
-
-  if (error) setStatus('Could not update: ' + error.message, true);
-
-  recordPracticeToday();
-  recordActivity();
-
-  if (justMastered) {
-    launchConfetti(2500);
-    document.getElementById('masteredTitle').textContent = 'Card mastered!';
-    document.getElementById('masteredWord').textContent = `"${card.front}" — you've nailed it 10 times in a row!`;
-    document.getElementById('masteredOverlay').classList.remove('hidden');
-  }
-
-  flipped = false;
-  typingAnswered = false;
-  dueQueue = dueQueue.filter(id => id !== card.id);
-  currentCard = pickCard();
-  if (!currentCard && practiceFilter !== null) {
-    const pool = cards.filter(c => c.lastQuality === practiceFilter);
-    currentCard = pool.length > 0 ? pool[Math.floor(Math.random() * pool.length)] : null;
-  }
-  render();
-}
-
-function renderCardZone() {
-  const zone = document.getElementById('cardZone');
-  const gradeRow = document.getElementById('gradeRow');
-
-  // Basic mode uses selected pool
-  const cardPool = !funMode ? (basicUseAllCards && allCards.length > 0 ? allCards : cards) : cards;
-
-  if (cardPool.length === 0) {
-    zone.innerHTML = '<div class="empty-state">You haven\'t added anything yet. Start now to practice.</div>';
-    gradeRow.classList.add('hidden');
-    showTypeInput(false);
-    return;
-  }
-
-  // Mastered mode — practice mastered cards only
-  if (masteredMode) {
-    const mastered = getMasteredCards();
-    if (mastered.length === 0) {
-      zone.innerHTML = '<div class="empty-state">No mastered cards yet. Keep practicing!</div>';
-      gradeRow.classList.add('hidden');
-      showTypeInput(false);
-      return;
-    }
-    if (!currentCard || !currentCard.mastered) {
-      currentCard = mastered[Math.floor(Math.random() * mastered.length)];
-    }
-  } else if (!funMode || isFunPhraseProfile()) {
-    // Basic mode or fun-phrase profile: random pick, no spaced repetition
-    if (!currentCard) currentCard = cardPool[Math.floor(Math.random() * cardPool.length)];
-  } else {
-    if (!currentCard) currentCard = pickCard();
-    if (currentCard) practiceFilter = null;
-  }
-
-  if (!currentCard) {
-    if (practiceFilter !== null) {
-      const pool = cards.filter(c => c.lastQuality === practiceFilter);
-      if (pool.length > 0) {
-        currentCard = pool[Math.floor(Math.random() * pool.length)];
-      } else {
-        const labels = { 1: 'Hard', 2: 'Moderate', 3: 'Easy' };
-        const remaining = [1, 2, 3].filter(q => q !== practiceFilter);
-        zone.innerHTML = `
-          <div class="empty-state">
-            <p style="margin:0 0 12px;">Nothing marked as ${labels[practiceFilter]}. Try another:</p>
-            <div class="practice-filters">
-              ${remaining.map(q => `<button data-pf="${q}">${labels[q]}</button>`).join('')}
-            </div>
-          </div>
-        `;
-        gradeRow.classList.add('hidden');
-        showTypeInput(false);
-        zone.querySelectorAll('.practice-filters button').forEach(b => {
-          b.onclick = () => {
-            practiceFilter = parseInt(b.dataset.pf, 10);
-            flipped = false;
-            render();
-          };
-        });
-        return;
-      }
-    } else {
-      // All cards practiced — show celebration
-      if (!masteredMode && cards.length > 0 && getPracticedCards().length === cards.length) {
-        showAllDone();
-      }
-      zone.innerHTML = `
-        <div class="empty-state">
-          <p style="margin:0 0 12px;">Nothing due right now. Practice by difficulty instead:</p>
-          <div class="practice-filters">
-            <button data-pf="1">Hard</button>
-            <button data-pf="2">Moderate</button>
-            <button data-pf="3">Easy</button>
-          </div>
-        </div>
-      `;
-      gradeRow.classList.add('hidden');
-      zone.querySelectorAll('.practice-filters button').forEach(b => {
-        b.onclick = () => {
-          practiceFilter = parseInt(b.dataset.pf, 10);
-          flipped = false;
-          currentCard = null;
-          render();
-        };
-      });
-      return;
-    }
-  }
-
-  const c = currentCard;
-  const frontWord = reverseMode ? c.back : c.front;
-  const backWord = reverseMode ? c.front : c.back;
-  const frontLang = reverseMode ? 'English' : 'German';
-  const backLang = reverseMode ? 'German' : 'English';
-  const masteredBadge = c.mastered ? `<span style="font-size:13px;margin-bottom:6px;opacity:0.7;" title="Mastered">✦ mastered</span>` : '';
-
-  zone.innerHTML = `
-    <div class="flip-card ${flipped ? 'flipped' : ''}" id="flipCard">
-      <div class="flip-inner">
-        <div class="face front">
-          ${masteredBadge}
-          <p class="lang">${frontLang}</p>
-          <p class="word">${escapeHtml(frontWord)}</p>
-          ${typeMode ? '' : '<p class="hint">Tap to reveal</p>'}
-          <button class="icon-btn speak-btn" id="speakBtn" aria-label="Pronounce word" title="Pronounce">
-            <i class="ti ti-volume" aria-hidden="true"></i>
-          </button>
-          <button class="icon-btn edit-btn" data-edit="front" aria-label="Edit card" title="Edit card">
-            <i class="ti ti-edit" aria-hidden="true"></i>
-          </button>
-        </div>
-        <div class="face back">
-          <p class="lang">${backLang}</p>
-          <p class="word">${escapeHtml(backWord)}</p>
-          ${!reverseMode && c.example ? `<p class="example">${escapeHtml(c.example)}</p>` : ''}
-          ${!reverseMode && c.notes ? `<p class="note-tag">${escapeHtml(c.notes)}</p>` : ''}
-          <p class="hint">${funMode ? 'Tap to flip back' : 'Tap for next card'}</p>
-          <button class="icon-btn edit-btn" data-edit="back" aria-label="Edit card" title="Edit card">
-            <i class="ti ti-edit" aria-hidden="true"></i>
-          </button>
-          <button class="icon-btn challenge-card-btn" aria-label="Challenge with this card" title="Challenge a friend with this card" style="bottom:10px;right:10px;top:auto;">
-            <i class="ti ti-bolt" aria-hidden="true"></i>
-          </button>
-        </div>
-      </div>
-    </div>
-  `;
-
-  document.getElementById('speakBtn').addEventListener('click', (e) => {
-    e.stopPropagation();
-    speak(reverseMode ? c.back : c.front);
-  });
-
-  zone.querySelectorAll('.edit-btn').forEach(b => {
-    b.addEventListener('click', (e) => {
-      e.stopPropagation();
-      openEditModal(c);
-    });
-  });
-
-  const challengeCardBtn = zone.querySelector('.challenge-card-btn');
-  if (challengeCardBtn) {
-    challengeCardBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      openChallengePicker(c);
-    });
-  }
-
-  document.getElementById('flipCard').addEventListener('click', () => {
-    if (typeMode) return;
-    const noGrading = !funMode || isFunPhraseProfile();
-    if (noGrading && flipped) {
-      // Basic mode or fun-phrase profile: second tap = next card
-      if (isFunPhraseProfile()) {
-        recordPracticeToday();
-        recordActivity();
-      }
-      flipped = false;
-      currentCard = null;
-      render();
-      return;
-    }
-    flipped = !flipped;
-    document.getElementById('flipCard').classList.toggle('flipped', flipped);
-    if (flipped && funMode && !isFunPhraseProfile()) {
-      gradeRow.classList.remove('hidden');
-      gradeRow.querySelectorAll('button').forEach(b => {
-        b.onclick = (e) => {
-          e.stopPropagation();
-          grade(currentCard, parseInt(b.dataset.q, 10));
-        };
-      });
-    } else {
-      gradeRow.classList.add('hidden');
-    }
-  });
-
-  if (typeMode && funMode && !isFunPhraseProfile()) {
-    gradeRow.classList.add('hidden');
-    showTypeInput(true);
-    setTimeout(() => document.getElementById('typeInput').focus(), 100);
-  } else {
-    showTypeInput(false);
-    if (flipped && funMode && !isFunPhraseProfile()) {
-      gradeRow.classList.remove('hidden');
-      gradeRow.querySelectorAll('button').forEach(b => {
-        b.onclick = (e) => {
-          e.stopPropagation();
-          grade(currentCard, parseInt(b.dataset.q, 10));
-        };
-      });
-    } else {
-      gradeRow.classList.add('hidden');
-    }
-  }
-}
-
-function render() {
-  document.getElementById('dueCount').textContent = getPracticedCards().length;
-  document.getElementById('totalCount').textContent = cards.length;
-  document.getElementById('masteredCount').textContent = getMasteredCards().length;
-  renderCardZone();
-  renderDeckList();
-  const chartSection = document.getElementById('chartSection');
-  if (chartSection && !chartSection.classList.contains('hidden')) renderHeatmap();
-}
-
-function renderDeckList() {
-  const list = document.getElementById('deckList');
-  if (!list) return;
-  const query = (document.getElementById('deckSearch').value || '').trim().toLowerCase();
-  if (!query) {
-    list.innerHTML = '<div class="deck-empty">Type to search your deck.</div>';
-    return;
-  }
-  const filtered = cards.filter(c =>
-    c.front.toLowerCase().includes(query) || c.back.toLowerCase().includes(query)
-  );
-  if (filtered.length === 0) {
-    list.innerHTML = '<div class="deck-empty">No matches.</div>';
-    return;
-  }
-  const sorted = [...filtered].sort((a, b) => a.front.localeCompare(b.front));
-  list.innerHTML = sorted.map(c => `
-    <div class="deck-item">
-      <div class="pair">
-        <span class="de">${escapeHtml(c.front)}</span>
-        <span class="en"> — ${escapeHtml(c.back)}</span>
-      </div>
-      <div class="deck-actions">
-        <button class="deck-edit" data-id="${c.id}" aria-label="Edit card" title="Edit"><i class="ti ti-edit" aria-hidden="true"></i></button>
-        <button class="del" data-id="${c.id}" aria-label="Delete card" title="Delete"><i class="ti ti-trash" aria-hidden="true"></i></button>
-      </div>
-    </div>
-  `).join('');
-  list.querySelectorAll('.deck-edit').forEach(b => {
+// ── Home screen ───────────────────────────────────────────
+function renderLevelTabs() {
+  const el = document.getElementById('levelTabs');
+  el.innerHTML = ['A1','A2','B1'].map(lvl =>
+    `<button class="level-tab ${lvl === currentLevel ? 'active' : ''}" data-level="${lvl}">${lvl}</button>`
+  ).join('');
+  el.querySelectorAll('.level-tab').forEach(b => {
     b.addEventListener('click', () => {
-      const card = cards.find(c => String(c.id) === b.dataset.id);
-      if (card) openEditModal(card);
+      currentLevel = b.dataset.level;
+      localStorage.setItem(profileKey('level'), currentLevel);
+      currentRung = getRungFor(currentLevel);
+      renderHome();
     });
   });
-  list.querySelectorAll('.del').forEach(b => {
-    b.addEventListener('click', () => deleteCard(b.dataset.id));
-  });
 }
 
-document.getElementById('addForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const frontInput = document.getElementById('frontInput');
-  const backInput = document.getElementById('backInput');
-  const exampleInput = document.getElementById('exampleInput');
-  const notesInput = document.getElementById('notesInput');
-  const front = frontInput.value.trim();
-  const back = backInput.value.trim();
-  const example = exampleInput.value.trim();
-  const notes = notesInput.value.trim();
-  if (front && back) {
-    await addCard(front, back, example, notes);
-    frontInput.value = '';
-    backInput.value = '';
-    exampleInput.value = '';
-    notesInput.value = '';
-    frontInput.focus();
-  }
-});
-
-// ── Confetti ──────────────────────────────────────────────
-function launchConfetti(duration = 2500) {
-  const canvas = document.getElementById('confettiCanvas');
-  const ctx = canvas.getContext('2d');
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  const pieces = Array.from({ length: 120 }, () => ({
-    x: Math.random() * canvas.width,
-    y: Math.random() * -canvas.height,
-    r: 4 + Math.random() * 6,
-    d: 1 + Math.random() * 2,
-    color: ['#C99A3B','#3A5A78','#B5564A','#7DD3A8','#9C6ADE'][Math.floor(Math.random() * 5)],
-    tilt: Math.random() * 10 - 5,
-    tiltSpeed: 0.1 + Math.random() * 0.2
-  }));
-  const end = Date.now() + duration;
-  function frame() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    pieces.forEach(p => {
-      p.y += p.d;
-      p.tilt += p.tiltSpeed;
-      ctx.beginPath();
-      ctx.ellipse(p.x + p.tilt, p.y, p.r, p.r * 0.4, p.tilt, 0, 2 * Math.PI);
-      ctx.fillStyle = p.color;
-      ctx.fill();
-      if (p.y > canvas.height) { p.y = -10; p.x = Math.random() * canvas.width; }
-    });
-    if (Date.now() < end) requestAnimationFrame(frame);
-    else ctx.clearRect(0, 0, canvas.width, canvas.height);
-  }
-  frame();
-}
-
-const MILESTONES = [1, 10, 50, 100];
-function checkMilestone(count) {
-  if (MILESTONES.includes(count) || (count >= 1000 && count % 1000 === 0)) {
-    launchConfetti();
-    const msgs = { 1: 'First card added! 🎉', 10: '10 cards — you\'re building a deck! 🚀', 50: '50 cards — serious learner! 🌟', 100: '100 cards! You\'re unstoppable! 🏆' };
-    const msg = msgs[count] || `${count} cards! Incredible! 🎊`;
-    setStatus(msg);
-  }
-}
-
-// ── All done ──────────────────────────────────────────────
-function showAllDone() {
-  launchConfetti(3500);
-  document.getElementById('allDoneOverlay').classList.remove('hidden');
-}
-
-document.getElementById('allDoneCloseBtn').addEventListener('click', () => {
-  document.getElementById('allDoneOverlay').classList.add('hidden');
-});
-
-document.getElementById('allDoneShuffleBtn').addEventListener('click', async () => {
-  document.getElementById('allDoneOverlay').classList.add('hidden');
-  document.getElementById('shuffleBtn').click();
-});
-
-// ── Quiz mode ─────────────────────────────────────────────
-let quizCard = null;
-let quizAnswered = false;
-let quizQueue = [];
-let quizIndex = 0;
-let quizTotal = 0;
-let quizScore = 0;
-let quizPool = 'mine';
-
-let allCards = []; // combined pool from all profiles
-
-async function fetchAllCards() {
-  const { data, error } = await sb.from('cards').select('*');
-  if (!error && data) allCards = data;
-}
-
-async function startQuizSizePicker() {
-  if (cards.length < 4) { setStatus('Need at least 4 cards to quiz.'); return; }
-  await fetchAllCards();
-  await fetchTypoBank();
-  const seenAll = new Set();
-  const uniqueAll = allCards.filter(c => {
-    const key = c.front.trim().toLowerCase() + '|' + c.back.trim().toLowerCase();
-    if (seenAll.has(key)) return false;
-    seenAll.add(key);
-    return true;
-  });
-  const hasCombined = uniqueAll.length > cards.length && uniqueAll.length >= 4;
-  const sizePicker = document.getElementById('quizSizePicker');
-  const cardArea = document.getElementById('quizCardArea');
-  const sizeOptions = document.getElementById('quizSizeOptions');
-
-  const myOptions = [10, 25, cards.length]
-    .filter((v, i, a) => a.indexOf(v) === i && v <= cards.length)
-    .map(s => `<button class="quiz-option" data-size="${s}" data-pool="mine">${s === cards.length ? `My full deck (${s})` : `${s} from my deck`}</button>`);
-
-  const combinedOptions = hasCombined
-    ? [10, 25, uniqueAll.length]
-        .filter((v, i, a) => a.indexOf(v) === i && v <= uniqueAll.length)
-        .map(s => `<button class="quiz-option" data-size="${s}" data-pool="all" style="border-color:var(--gold);">${s === uniqueAll.length ? `Everyone's full deck (${s})` : `${s} from everyone's deck`}</button>`)
-    : [];
-
-  sizeOptions.innerHTML = [...myOptions, ...combinedOptions].join('');
-  sizePicker.style.display = 'block';
-  cardArea.style.display = 'none';
-  document.getElementById('quizProgress').textContent = '';
-  document.getElementById('quizNextBtn').classList.add('hidden');
-  sizeOptions.querySelectorAll('.quiz-option').forEach(b => {
-    b.addEventListener('click', () => startQuiz(parseInt(b.dataset.size), b.dataset.pool));
-  });
-  document.getElementById('quizOverlay').classList.remove('hidden');
-}
-
-function startQuiz(size, pool = 'mine') {
-  const source = pool === 'all' ? allCards : cards;
-  // Deduplicate by front+back
-  const seen = new Set();
-  const unique = source.filter(c => {
-    const key = c.front.trim().toLowerCase() + '|' + c.back.trim().toLowerCase();
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
-  const shuffled = [...unique].sort(() => Math.random() - 0.5);
-  quizQueue = shuffled.slice(0, size);
-  quizIndex = 0;
-  quizTotal = quizQueue.length;
-  quizScore = 0;
-  quizPool = pool;
-  document.getElementById('quizSizePicker').style.display = 'none';
-  document.getElementById('quizCardArea').style.display = 'block';
-  showQuizCard(pool);
-}
-
-function showQuizCard(pool) {
-  if (quizIndex >= quizTotal) {
-    showQuizFinished();
-    return;
-  }
-  quizAnswered = false;
-  quizCard = quizQueue[quizIndex];
-  document.getElementById('quizProgress').textContent = `${quizIndex + 1} / ${quizTotal}`;
-  const addWrap = document.getElementById('quizAddToDeck');
-  if (addWrap) addWrap.style.display = 'none';
-  const optionPool = pool === 'all' ? allCards : cards;
-  const options = getQuizOptions(quizCard.back, optionPool);
-  document.getElementById('quizQuestion').textContent = quizCard.front;
-  const optEl = document.getElementById('quizOptions');
-  optEl.innerHTML = options.map(o => `<button class="quiz-option" data-answer="${escapeHtml(o)}">${escapeHtml(o)}</button>`).join('');
-  optEl.querySelectorAll('.quiz-option').forEach(b => {
-    b.addEventListener('click', () => {
-      if (quizAnswered) return;
-      quizAnswered = true;
-      const correct = b.dataset.answer === quizCard.back;
-      if (correct) quizScore++;
-      b.classList.add(correct ? 'correct' : 'wrong');
-      optEl.querySelectorAll('.quiz-option').forEach(btn => {
-        btn.disabled = true;
-        if (btn.dataset.answer === quizCard.back) btn.classList.add('correct');
-      });
-      const result = document.getElementById('quizResult');
-      result.textContent = correct ? '✓ Correct!' : `✗ It was "${quizCard.back}"`;
-      result.className = 'quiz-result ' + (correct ? 'correct-msg' : 'wrong-msg');
-      result.classList.remove('hidden');
-
-      // Show "Add to my deck" if this card is from another profile
-      const addWrap = document.getElementById('quizAddToDeck');
-      const alreadyMine = cards.some(c => c.id === quizCard.id);
-      if (!alreadyMine && quizPool === 'all') {
-        addWrap.style.display = 'block';
-        addWrap.innerHTML = `<button id="quizAddCardBtn" style="font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:500;border:1px solid var(--accent);background:var(--accent-soft);color:var(--ink);border-radius:8px;padding:5px 12px;cursor:pointer;">+ Add "${escapeHtml(quizCard.front)}" to my deck</button>`;
-        document.getElementById('quizAddCardBtn').addEventListener('click', async () => {
-          await addCard(quizCard.front, quizCard.back, quizCard.example, quizCard.notes);
-          document.getElementById('quizAddCardBtn').textContent = '✓ Added!';
-          document.getElementById('quizAddCardBtn').disabled = true;
-        });
-      } else {
-        addWrap.style.display = 'none';
-      }
-
-      const nextBtn = document.getElementById('quizNextBtn');
-      nextBtn.textContent = quizIndex + 1 < quizTotal ? 'Next' : 'See results';
-      nextBtn.classList.remove('hidden');
-    });
-  });
-  document.getElementById('quizResult').className = 'quiz-result hidden';
-  document.getElementById('quizNextBtn').classList.add('hidden');
-}
-
-function showQuizFinished() {
-  document.getElementById('quizProgress').textContent = '';
-  document.getElementById('quizQuestion').textContent = '';
-  document.getElementById('quizOptions').innerHTML = '';
-  const pct = Math.round((quizScore / quizTotal) * 100);
-  const emoji = pct === 100 ? '🏆' : pct >= 80 ? '🌟' : pct >= 50 ? '👍' : '💪';
-  document.getElementById('quizResult').className = 'quiz-result correct-msg';
-  document.getElementById('quizResult').innerHTML = `${emoji} ${quizScore} / ${quizTotal} correct (${pct}%)`;
-  const nextBtn = document.getElementById('quizNextBtn');
-  nextBtn.textContent = 'Quiz again';
-  nextBtn.classList.remove('hidden');
-  if (pct === 100) launchConfetti(2000);
-}
-
-document.getElementById('quizBtn').addEventListener('click', startQuizSizePicker);
-document.getElementById('quizCloseBtn').addEventListener('click', () => {
-  document.getElementById('quizOverlay').classList.add('hidden');
-});
-document.getElementById('quizNextBtn').addEventListener('click', () => {
-  if (document.getElementById('quizNextBtn').textContent === 'Quiz again') {
-    document.getElementById('quizOverlay').classList.add('hidden');
-    startQuizSizePicker();
-  } else {
-    quizIndex++;
-    showQuizCard(quizPool);
-  }
-});
-
-// ── Challenge mode ────────────────────────────────────────
-let challengeChannel = null;
-let activeChallengeId = null;
-let challengeRole = null;
-let challengeCardId = null;
-
-async function fetchOtherProfiles() {
-  const { data } = await sb.from('streaks').select('profile, avatar_emoji');
-  return (data || []).filter(p => p.profile !== profile);
-}
-
-function openChallengePicker(specificCard) {
-  if (specificCard instanceof Event) specificCard = null;
-  const overlay = document.getElementById('challengeOverlay');
-  const body = document.getElementById('challengeBody');
-
-  // If there are pending challenges and no specific card, show accept/challenge menu
-  if (!specificCard && pendingChallenges.length > 0) {
-    document.getElementById('challengeTitle').textContent = 'Challenge';
-    body.innerHTML = `
-      ${pendingChallenges.length > 0 ? `
-        <p style="font-size:0.85rem;color:var(--ink-soft);margin:0 0 6px;">Pending challenges:</p>
-        <div class="challenge-profile-list" id="pendingList">
-          ${pendingChallenges.map((c, i) => `
-            <button data-index="${i}">🎯 ${escapeHtml(c.created_by)} ${c.cards ? `— <em>${escapeHtml(c.cards.front)}</em>` : ''}</button>
-          `).join('')}
-        </div>
-        <hr style="border:none;border-top:1px solid var(--border);margin:0.75rem 0;">
-      ` : ''}
-      <button id="challengeSomeoneBtn" style="width:100%;font-family:'Inter',sans-serif;font-size:0.9rem;font-weight:500;text-align:left;border:1px solid var(--border);background:var(--bg);color:var(--ink);border-radius:8px;padding:0.6rem 0.85rem;cursor:pointer;">⚡ Challenge someone</button>
+function renderLadder() {
+  currentRung = getRungFor(currentLevel);
+  const el = document.getElementById('ladderRungs');
+  const heights = [30, 42, 54, 66, 78];
+  el.innerHTML = '';
+  for (let i = 1; i <= RUNG_COUNT; i++) {
+    const state = i < currentRung ? 'done' : i === currentRung ? 'current' : 'locked';
+    const rungDiv = document.createElement('div');
+    rungDiv.className = `rung ${state}`;
+    rungDiv.innerHTML = `
+      <div class="rung-bar" style="height:${heights[i-1]}px; background:${state === 'locked' ? '' : currentAvatar.color};"></div>
+      <div class="rung-num">${i}</div>
     `;
-    body.querySelectorAll('#pendingList button').forEach(b => {
-      b.addEventListener('click', async () => {
-        const idx = parseInt(b.dataset.index);
-        const c = pendingChallenges[idx];
-        pendingChallenges.splice(idx, 1);
-        updateChallengeBadge();
-        overlay.classList.add('hidden');
-        await showOpponentChallenge(c);
-      });
-    });
-    document.getElementById('challengeSomeoneBtn').addEventListener('click', () => {
-      showChallengeSomeonePicker(null);
-    });
-    overlay.classList.remove('hidden');
+    el.appendChild(rungDiv);
+  }
+  document.getElementById('ladderTitle').textContent = `${currentLevel} ladder · rung ${currentRung} of ${RUNG_COUNT}`;
+}
+
+function renderChallengeCard() {
+  currentPrompt = pickPrompt(currentLevel, currentRung);
+  const badge = document.getElementById('challengeRungBadge');
+  badge.textContent = `Rung ${currentRung}`;
+  badge.style.background = currentAvatar.color;
+  document.getElementById('challengePromptText').textContent = currentPrompt;
+}
+
+function renderStats() {
+  const history = getHistory().filter(h => h.level === currentLevel);
+  const el = document.getElementById('statsStrip');
+  const count = history.length;
+  const passes = history.filter(h => h.pass).length;
+  const passRate = count > 0 ? Math.round((passes / count) * 100) : 0;
+  el.innerHTML = `
+    <div class="stat-pill"><span class="num">${count}</span><span class="label">Rounds</span></div>
+    <div class="stat-pill"><span class="num">${passRate || '—'}${count ? '%' : ''}</span><span class="label">Pass rate</span></div>
+    <div class="stat-pill"><span class="num">${currentRung}</span><span class="label">Current rung</span></div>
+  `;
+}
+
+function renderHome() {
+  renderLevelTabs();
+  renderLadder();
+  renderChallengeCard();
+  renderStats();
+}
+
+document.getElementById('skipPromptBtn').addEventListener('click', renderChallengeCard);
+document.getElementById('playBtn').addEventListener('click', () => startGame());
+document.getElementById('historyLink').addEventListener('click', () => {
+  renderHistoryScreen();
+  show('historyScreen');
+});
+document.getElementById('historyBackBtn').addEventListener('click', () => show('homeScreen'));
+
+// ── Game screen ───────────────────────────────────────────
+function startGame() {
+  finalTranscript = '';
+  interimTranscript = '';
+  elapsedSeconds = 0;
+  isRecording = false;
+
+  document.getElementById('gamePromptText').textContent = currentPrompt;
+  document.getElementById('liveWords').textContent = 'Tap the mic and start talking…';
+  document.getElementById('liveWords').classList.remove('has-text');
+  document.getElementById('micBtn').textContent = '🎤';
+  document.getElementById('micBtn').classList.remove('recording');
+  document.getElementById('discardBtn').classList.add('hidden');
+  document.getElementById('finishBtn').classList.add('hidden');
+
+  const limit = TIME_PER_RUNG[currentRung];
+  updateClock(0, limit);
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  document.getElementById('micNote').classList.toggle('hidden', !!SpeechRecognition);
+
+  show('gameScreen');
+}
+
+document.getElementById('exitGameBtn').addEventListener('click', () => {
+  stopRecording();
+  show('homeScreen');
+});
+
+function updateClock(elapsed, limit) {
+  const remaining = Math.max(0, limit - elapsed);
+  const m = Math.floor(remaining / 60);
+  const s = remaining % 60;
+  document.getElementById('clockLabel').textContent = `${m}:${s.toString().padStart(2, '0')}`;
+  const fill = document.getElementById('clockFill');
+  const circumference = 540;
+  const fraction = Math.max(0, 1 - elapsed / limit);
+  fill.style.strokeDashoffset = circumference * (1 - fraction);
+  fill.classList.remove('warm', 'hot');
+  if (fraction < 0.15) fill.classList.add('hot');
+  else if (fraction < 0.4) fill.classList.add('warm');
+}
+
+function startRecording() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const limit = TIME_PER_RUNG[currentRung];
+
+  if (SpeechRecognition) {
+    recognition = new SpeechRecognition();
+    recognition.lang = 'de-DE';
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    recognition.onresult = (event) => {
+      let interim = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const piece = event.results[i][0].transcript;
+        if (event.results[i].isFinal) finalTranscript += piece + ' ';
+        else interim += piece;
+      }
+      interimTranscript = interim;
+      updateLiveWords();
+    };
+    recognition.onerror = (e) => { if (e.error !== 'no-speech') console.warn(e.error); };
+    recognition.onend = () => { if (isRecording) { try { recognition.start(); } catch (e) {} } };
+    try { recognition.start(); } catch (e) {}
+  }
+
+  isRecording = true;
+  sessionStartTime = Date.now();
+  document.getElementById('micBtn').textContent = '⏹';
+  document.getElementById('micBtn').classList.add('recording');
+
+  timerInterval = setInterval(() => {
+    elapsedSeconds = Math.floor((Date.now() - sessionStartTime) / 1000);
+    updateClock(elapsedSeconds, limit);
+    if (elapsedSeconds >= limit) stopRecording();
+  }, 250);
+}
+
+function stopRecording() {
+  isRecording = false;
+  if (recognition) { try { recognition.stop(); } catch (e) {} recognition = null; }
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+  document.getElementById('micBtn').textContent = '🎤';
+  document.getElementById('micBtn').classList.remove('recording');
+
+  if ((finalTranscript + interimTranscript).trim().length > 0) {
+    document.getElementById('discardBtn').classList.remove('hidden');
+    document.getElementById('finishBtn').classList.remove('hidden');
+  }
+}
+
+function updateLiveWords() {
+  const el = document.getElementById('liveWords');
+  const text = (finalTranscript + interimTranscript).trim();
+  if (text) { el.textContent = text; el.classList.add('has-text'); }
+}
+
+document.getElementById('micBtn').addEventListener('click', () => {
+  if (isRecording) {
+    stopRecording();
+  } else {
+    finalTranscript = '';
+    interimTranscript = '';
+    document.getElementById('liveWords').textContent = 'Listening…';
+    document.getElementById('liveWords').classList.remove('has-text');
+    document.getElementById('discardBtn').classList.add('hidden');
+    document.getElementById('finishBtn').classList.add('hidden');
+    startRecording();
+  }
+});
+
+document.getElementById('discardBtn').addEventListener('click', () => {
+  finalTranscript = '';
+  interimTranscript = '';
+  document.getElementById('liveWords').textContent = 'Tap the mic and start talking…';
+  document.getElementById('liveWords').classList.remove('has-text');
+  document.getElementById('discardBtn').classList.add('hidden');
+  document.getElementById('finishBtn').classList.add('hidden');
+});
+
+document.getElementById('finishBtn').addEventListener('click', () => {
+  stopRecording();
+  scoreRound();
+});
+
+// ── Scoring ───────────────────────────────────────────────
+const FILLER_WORDS = ['äh','ähm','also','halt','irgendwie','sozusagen'];
+
+function scoreRound() {
+  const transcript = (finalTranscript + interimTranscript).trim();
+  const words = transcript.split(/\s+/).filter(Boolean);
+  const wordCount = words.length;
+  const limit = TIME_PER_RUNG[currentRung];
+  const duration = Math.max(1, elapsedSeconds);
+  const wpm = Math.round((wordCount / duration) * 60);
+  const fillerCount = words.filter(w => FILLER_WORDS.includes(w.toLowerCase().replace(/[.,!?]/g, ''))).length;
+
+  // Simple pass threshold: enough words spoken relative to rung expectations
+  const minWordsForRung = { 1: 4, 2: 6, 3: 10, 4: 14, 5: 18 };
+  const suggestedPass = wordCount >= minWordsForRung[currentRung] && wpm >= 25;
+
+  lastResult = {
+    level: currentLevel,
+    rung: currentRung,
+    prompt: currentPrompt,
+    transcript: transcript || '(no speech detected)',
+    wordCount, wpm, fillerCount, duration,
+    suggestedPass,
+    pass: suggestedPass,
+    date: new Date().toISOString()
+  };
+
+  renderResult();
+  show('resultScreen');
+}
+
+function renderResult() {
+  const badge = document.getElementById('resultBadge');
+  badge.className = 'result-badge ' + (lastResult.pass ? 'pass' : 'fail');
+  badge.textContent = lastResult.pass ? '🎉' : '💪';
+
+  document.getElementById('resultTitle').textContent = lastResult.pass ? 'Nice one!' : 'Almost there!';
+  document.getElementById('resultSub').textContent = lastResult.pass
+    ? `Rung ${lastResult.rung} cleared — climbing up!`
+    : `Rung ${lastResult.rung} — let's try an easier one next.`;
+
+  document.getElementById('resultStats').innerHTML = `
+    <div class="result-stat"><span class="val">${lastResult.wordCount}</span><span class="lbl">Words</span></div>
+    <div class="result-stat"><span class="val">${lastResult.wpm}</span><span class="lbl">WPM</span></div>
+    <div class="result-stat"><span class="val">${lastResult.duration}s</span><span class="lbl">Time</span></div>
+  `;
+
+  document.getElementById('resultTranscript').textContent = lastResult.transcript;
+
+  const overrideRow = document.getElementById('overrideRow');
+  overrideRow.querySelectorAll('.thumb-btn').forEach(b => {
+    b.classList.remove('selected');
+    if ((b.dataset.pass === 'true') === lastResult.pass) b.classList.add('selected');
+  });
+}
+
+document.getElementById('overrideRow').querySelectorAll('.thumb-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    lastResult.pass = b.dataset.pass === 'true';
+    renderResult();
+  });
+});
+
+document.getElementById('resultBackBtn').addEventListener('click', () => show('homeScreen'));
+document.getElementById('retryBtn').addEventListener('click', () => startGame());
+
+document.getElementById('nextBtn').addEventListener('click', () => {
+  saveHistoryEntry(lastResult);
+  let rung = getRungFor(currentLevel);
+  if (lastResult.pass) rung = Math.min(RUNG_COUNT, rung + 1);
+  else rung = Math.max(1, rung - 1);
+  setRungFor(currentLevel, rung);
+  renderHome();
+  show('homeScreen');
+});
+
+// ── History ───────────────────────────────────────────────
+function renderHistoryScreen() {
+  const history = getHistory();
+  const el = document.getElementById('historyList');
+  if (history.length === 0) {
+    el.innerHTML = '<div class="empty-state">No rounds played yet. Go climb the ladder!</div>';
     return;
   }
-
-  showChallengeSomeonePicker(specificCard);
-}
-
-function showChallengeSomeonePicker(specificCard) {
-  const overlay = document.getElementById('challengeOverlay');
-  const body = document.getElementById('challengeBody');
-  document.getElementById('challengeTitle').textContent = 'Challenge a friend';
-  fetchOtherProfiles().then(others => {
-    if (others.length === 0) {
-      body.innerHTML = '<p class="challenge-waiting">No other profiles yet. Share the app with friends first!</p>';
-      overlay.classList.remove('hidden');
-      return;
-    }
-    let selectedCard = specificCard || null;
-    const cardSection = specificCard
-      ? `<p style="font-size:0.85rem;color:var(--ink-soft);margin:0 0 10px;">Challenging with: <strong>${escapeHtml(specificCard.front)}</strong></p>`
-      : `<p style="font-size:0.85rem;color:var(--ink-soft);margin:0 0 6px;">Search a word to challenge with (or leave blank for random):</p>
-         <input id="challengeCardSearch" autocomplete="off" placeholder="Type a German word…" style="width:100%;font-family:'Inter',sans-serif;font-size:0.9rem;padding:0.5rem 0.75rem;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--ink);margin-bottom:6px;">
-         <div id="challengeCardResults" style="max-height:140px;overflow-y:auto;margin-bottom:10px;"></div>`;
-    body.innerHTML = `${cardSection}
-      <p style="font-size:0.85rem;color:var(--ink-soft);margin:0 0 6px;">Challenge who?</p>
-      <div class="challenge-profile-list">${others.map(p =>
-        `<button data-profile="${escapeHtml(p.profile)}">${p.avatar_emoji || ''} ${escapeHtml(p.profile)}</button>`
-      ).join('')}</div>`;
-
-    if (!specificCard) {
-      const searchInput = body.querySelector('#challengeCardSearch');
-      const resultsEl = body.querySelector('#challengeCardResults');
-      if (searchInput && resultsEl) {
-        searchInput.addEventListener('input', () => {
-          const q = searchInput.value.trim().toLowerCase();
-          if (!q) { resultsEl.innerHTML = ''; selectedCard = null; return; }
-          const matches = cards.filter(c =>
-            c.front.toLowerCase().includes(q) || c.back.toLowerCase().includes(q)
-          ).slice(0, 5);
-          resultsEl.innerHTML = matches.map(c =>
-            `<div class="deck-item" style="cursor:pointer;" data-id="${c.id}">
-              <div class="pair"><span class="de">${escapeHtml(c.front)}</span><span class="en"> — ${escapeHtml(c.back)}</span></div>
-            </div>`
-          ).join('');
-          resultsEl.querySelectorAll('.deck-item').forEach(row => {
-            row.addEventListener('click', () => {
-              resultsEl.querySelectorAll('.deck-item').forEach(r => r.style.background = '');
-              row.style.background = 'var(--accent-soft)';
-              selectedCard = cards.find(c => String(c.id) === row.dataset.id) || null;
-              if (selectedCard) searchInput.value = selectedCard.front;
-            });
-          });
-        });
-      }
-    }
-
-    body.querySelectorAll('button[data-profile]').forEach(b => {
-      b.addEventListener('click', () => {
-        const card = selectedCard || cards[Math.floor(Math.random() * cards.length)];
-        startChallenge(b.dataset.profile, card);
-      });
-    });
-    overlay.classList.remove('hidden');
-  });
-}
-
-async function startChallenge(opponent, card) {
-  if (!card) { setStatus('Pick a card first.'); return; }
-  challengeCardId = card.id;
-  challengeRole = 'challenger';
-  const { data, error } = await sb.from('challenges').insert({
-    created_by: profile, invited: opponent, card_id: card.id, status: 'pending'
-  }).select().single();
-  if (error) { setStatus('Could not start challenge.'); return; }
-  activeChallengeId = data.id;
-  showChallengeWaiting(card, opponent, data.id);
-}
-
-function showChallengeWaiting(card, opponent, challengeId) {
-  const body = document.getElementById('challengeBody');
-  document.getElementById('challengeTitle').textContent = 'Waiting for opponent…';
-  body.innerHTML = `
-    <p class="challenge-waiting">Challenge sent to <strong>${escapeHtml(opponent)}</strong>!</p>
-    <p class="challenge-card">${escapeHtml(card.front)}</p>
-    <p class="challenge-waiting" style="font-size:0.8rem;">Waiting for them to guess…</p>
-  `;
-  subscribeToChallenge(challengeId, card);
-}
-
-function subscribeToChallenge(challengeId, card) {
-  if (challengeChannel) sb.removeChannel(challengeChannel);
-  challengeChannel = sb.channel('challenge-' + challengeId)
-    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'challenges', filter: `id=eq.${challengeId}` }, payload => {
-      showChallengeResult(payload.new, card);
-    })
-    .subscribe();
-}
-
-async function showChallengeResult(challenge, card) {
-  const body = document.getElementById('challengeBody');
-  document.getElementById('challengeTitle').textContent = 'Result!';
-  const won = challenge.winner === profile;
-  body.innerHTML = `
-    <p style="text-align:center;font-size:1.8rem;margin:0.5rem 0;">${won ? '🏆' : '😅'}</p>
-    <p class="challenge-card">${escapeHtml(card ? card.front : '')}</p>
-    <p style="text-align:center;font-size:0.9rem;color:var(--ink-soft);">Answer: <strong>${escapeHtml(card ? card.back : '')}</strong></p>
-    <p style="text-align:center;font-size:0.9rem;font-weight:600;color:${won ? 'var(--gold)' : 'var(--red)'};">${won ? '🎉 You won!' : `${escapeHtml(challenge.winner)} got it first!`}</p>
-  `;
-  if (won) launchConfetti(2000);
-  if (challengeChannel) { sb.removeChannel(challengeChannel); challengeChannel = null; }
-}
-
-let pendingChallenges = [];
-let pendingChallengeIndex = 0;
-
-function updateChallengeBadge() {
-  // Defensive filter: never show challenges that aren't actually for this profile
-  pendingChallenges = pendingChallenges.filter(c => c.invited === profile);
-  const badge = document.getElementById('challengeBadge');
-  if (pendingChallenges.length > 0) {
-    badge.textContent = pendingChallenges.length;
-    badge.style.display = 'inline-block';
-  } else {
-    badge.style.display = 'none';
-  }
-}
-
-async function addPendingChallenge(data) {
-  // Safety check: only accept challenges actually invited to the current profile
-  if (data.invited !== profile) return;
-  if (data.card_id) {
-    const { data: cardData } = await sb.from('cards').select('*').eq('id', data.card_id).single();
-    data.cards = cardData;
-  }
-  if (!pendingChallenges.find(c => c.id === data.id)) {
-    pendingChallenges.push(data);
-  }
-  updateChallengeBadge();
-}
-
-async function checkPendingChallenge() {
-  const { data } = await sb.from('challenges').select('*').eq('invited', profile).eq('status', 'pending').order('created_at', { ascending: false });
-  if (data && data.length > 0) {
-    for (const d of data) await addPendingChallenge(d);
-  }
-  subscribeIncomingChallenges();
-}
-
-let incomingChannel = null;
-
-function subscribeIncomingChallenges() {
-  if (incomingChannel) { sb.removeChannel(incomingChannel); incomingChannel = null; }
-  incomingChannel = sb.channel('incoming-challenges-' + profile)
-    .on('postgres_changes', {
-      event: 'INSERT', schema: 'public', table: 'challenges',
-      filter: `invited=eq.${profile}`
-    }, async payload => {
-      const { data } = await sb.from('challenges').select('*').eq('id', payload.new.id).single();
-      if (data && data.status === 'pending') {
-        await addPendingChallenge(data);
-      }
-    })
-    .subscribe();
-}
-
-async function showOpponentChallenge(challenge) {
-  // Fetch the card directly since join may not resolve
-  let card = challenge.cards;
-  if (!card && challenge.card_id) {
-    const { data } = await sb.from('cards').select('*').eq('id', challenge.card_id).single();
-    card = data;
-  }
-  if (!card) { setStatus('Challenge card not found.'); return; }
-  // Fetch all cards for wrong options if needed
-  if (allCards.length < 4) await fetchAllCards();
-  const optionSource = allCards.length >= 4 ? allCards : cards.length >= 4 ? cards : null;
-  if (!optionSource) { setStatus('Not enough cards in the app to generate options yet.'); return; }
-  const overlay = document.getElementById('challengeOverlay');
-  const body = document.getElementById('challengeBody');
-  document.getElementById('challengeTitle').textContent = `${escapeHtml(challenge.created_by)} challenges you!`;
-  const wrongs = optionSource.filter(c => c.id !== card.id);
-  const options = [card.back];
-  const pool = [...wrongs];
-  while (options.length < 4 && pool.length > 0) {
-    const idx = Math.floor(Math.random() * pool.length);
-    const pick = pool.splice(idx, 1)[0].back;
-    if (!options.includes(pick)) options.push(pick);
-  }
-  while (options.length < 4) options.push('—');
-  options.sort(() => Math.random() - 0.5);
-  body.innerHTML = `
-    <p class="challenge-card">${escapeHtml(card.front)}</p>
-    <div class="quiz-options">${options.map(o => `<button class="quiz-option" data-answer="${escapeHtml(o)}">${escapeHtml(o)}</button>`).join('')}</div>
-    <p class="quiz-result hidden" id="challengeAnswerResult"></p>
-    <div id="challengeAddToDeck" style="display:none; margin-top:8px; text-align:center;"></div>
-  `;
-  body.querySelectorAll('.quiz-option').forEach(b => {
-    b.addEventListener('click', async () => {
-      body.querySelectorAll('.quiz-option').forEach(btn => {
-        btn.disabled = true;
-        if (btn.dataset.answer === card.back) btn.classList.add('correct');
-      });
-      const correct = b.dataset.answer === card.back;
-      if (!correct) b.classList.add('wrong');
-      await sb.from('challenges').update({
-        status: 'answered', winner: correct ? profile : challenge.created_by
-      }).eq('id', challenge.id);
-      const res = document.getElementById('challengeAnswerResult');
-      if (res) {
-        res.textContent = correct ? '✓ Correct! Result sent!' : `✗ Wrong! Answer: "${card.back}"`;
-        res.className = 'quiz-result ' + (correct ? 'correct-msg' : 'wrong-msg');
-        res.classList.remove('hidden');
-      }
-      // Show "Add to my deck" if card isn't already in user's deck
-      const alreadyMine = cards.some(c => c.id === card.id);
-      const addWrap = document.getElementById('challengeAddToDeck');
-      if (!alreadyMine && addWrap) {
-        addWrap.style.display = 'block';
-        addWrap.innerHTML = `<button id="challengeAddCardBtn" style="font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:500;border:1px solid var(--accent);background:var(--accent-soft);color:var(--ink);border-radius:8px;padding:5px 12px;cursor:pointer;">+ Add "${escapeHtml(card.front)}" to my deck</button>`;
-        document.getElementById('challengeAddCardBtn').addEventListener('click', async () => {
-          await addCard(card.front, card.back, card.example, card.notes);
-          document.getElementById('challengeAddCardBtn').textContent = '✓ Added!';
-          document.getElementById('challengeAddCardBtn').disabled = true;
-        });
-      }
-      if (correct) launchConfetti(2000);
-    });
-  });
-  overlay.classList.remove('hidden');
-}
-
-document.getElementById('challengeBtn').addEventListener('click', () => openChallengePicker());
-document.getElementById('challengeCloseBtn').addEventListener('click', () => {
-  document.getElementById('challengeOverlay').classList.add('hidden');
-  if (challengeChannel) { sb.removeChannel(challengeChannel); challengeChannel = null; }
-});
-
-document.getElementById('shuffleBtn').addEventListener('click', async () => {
-  if (cards.length === 0) return;
-  setStatus('Shuffling and resetting progress...');
-  for (const c of cards) {
-    c.interval = 0;
-    c.due = now();
-    c.reps = 0;
-    c.lastQuality = null;
-    const { error } = await sb.from('cards').update({
-      interval: 0, due: c.due, reps: 0
-    }).eq('id', c.id);
-    if (error) {
-      setStatus('Could not update: ' + error.message, true);
-      return;
-    }
-  }
-  setStatus('Deck reshuffled, progress reset.');
-  flipped = false;
-  practiceFilter = null;
-  dueQueue = shuffleArray(cards.map(c => c.id));
-  currentCard = cards.find(c => c.id === dueQueue[0]) || null;
-  render();
-});
-
-document.querySelectorAll('.toolbar-group button[data-send]').forEach(b => {
-  b.addEventListener('click', async () => {
-    const quality = parseInt(b.dataset.send, 10);
-    const toSend = cards.filter(c => c.lastQuality === quality);
-    if (toSend.length === 0) {
-      setStatus('No cards marked as ' + b.textContent.trim() + '.');
-      return;
-    }
-    setStatus('Sending cards back to deck...');
-    for (const c of toSend) {
-      c.interval = 0;
-      c.due = now();
-      c.reps = 0;
-      c.lastQuality = null;
-      const { error } = await sb.from('cards').update({
-        interval: 0, due: c.due, reps: 0
-      }).eq('id', c.id);
-      if (error) {
-        setStatus('Could not update: ' + error.message, true);
-        return;
-      }
-    }
-    setStatus(toSend.length + ' card(s) sent back to deck.');
-    flipped = false;
-    practiceFilter = null;
-    currentCard = pickCard();
-    render();
-  });
-});
-
-function applyTheme(theme) {
-  document.documentElement.setAttribute('data-theme', theme);
-}
-
-function initTheme() {
-  let theme = 'light';
-  try {
-    theme = localStorage.getItem('vokabelkarten-theme') || 'light';
-  } catch (e) {}
-  applyTheme(theme);
-}
-
-document.getElementById('themeToggle').addEventListener('click', () => {
-  const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
-  const next = current === 'dark' ? 'light' : 'dark';
-  applyTheme(next);
-  try { localStorage.setItem('vokabelkarten-theme', next); } catch (e) {}
-});
-
-initTheme();
-
-// ── Basic / Fun mode toggle ───────────────────────────────
-let funMode = false;
-const FUN_PHRASE_PROFILE = 'DinosRawwwrrrr';
-function isFunPhraseProfile() {
-  return profile === FUN_PHRASE_PROFILE;
-}
-let basicUseAllCards = false;
-
-document.getElementById('basicMyDeckBtn').addEventListener('click', () => {
-  basicUseAllCards = false;
-  document.getElementById('basicMyDeckBtn').classList.add('active');
-  document.getElementById('basicAllBtn').classList.remove('active');
-  flipped = false;
-  currentCard = null;
-  render();
-});
-
-document.getElementById('basicAllBtn').addEventListener('click', async () => {
-  basicUseAllCards = true;
-  document.getElementById('basicAllBtn').classList.add('active');
-  document.getElementById('basicMyDeckBtn').classList.remove('active');
-  await fetchAllCards();
-  flipped = false;
-  currentCard = null;
-  render();
-});
-
-async function applyMode(fun) {
-  funMode = fun;
-  const btn = document.getElementById('modeToggle');
-  const label = document.getElementById('modeToggleLabel');
-  if (fun) {
-    document.body.classList.remove('basic-mode');
-    btn.classList.add('fun');
-    label.textContent = 'Fun';
-  } else {
-    document.body.classList.add('basic-mode');
-    btn.classList.remove('fun');
-    label.textContent = 'Basic';
-    reverseMode = false;
-    typeMode = false;
-    masteredMode = false;
-    showTypeInput(false);
-    basicUseAllCards = false;
-    document.getElementById('basicMyDeckBtn').classList.add('active');
-    document.getElementById('basicAllBtn').classList.remove('active');
-  }
-  flipped = false;
-  currentCard = null;
-  try { localStorage.setItem('vokabelkarten-mode', fun ? 'fun' : 'basic'); } catch (e) {}
-  render();
-}
-
-function initMode() {
-  let saved = 'basic';
-  try { saved = localStorage.getItem('vokabelkarten-mode') || 'basic'; } catch (e) {}
-  applyMode(saved === 'fun');
-}
-
-document.getElementById('modeToggle').addEventListener('click', () => {
-  applyMode(!funMode);
-});
-
-initMode();
-
-// Section toggles
-function setupSectionToggle(toggleId, sectionId, onOpen) {
-  const toggle = document.getElementById(toggleId);
-  const section = document.getElementById(sectionId);
-  toggle.addEventListener('click', () => {
-    const isHidden = section.classList.contains('hidden');
-    section.classList.toggle('hidden');
-    toggle.classList.toggle('open');
-    if (isHidden && onOpen) onOpen();
-  });
-}
-
-setupSectionToggle('deckToggle', 'deckSection', renderDeckList);
-setupSectionToggle('chartToggle', 'chartSection', renderHeatmap);
-
-document.getElementById('deckSearch').addEventListener('input', renderDeckList);
-
-let activityData = {};
-
-async function fetchActivity() {
-  const since = new Date();
-  since.setDate(since.getDate() - 91); // ~13 weeks
-  const sinceStr = since.toISOString().split('T')[0];
-  const { data, error } = await sb.from('activity').select('date, count').eq('profile', profile).gte('date', sinceStr);
-  if (error) return;
-  activityData = {};
-  (data || []).forEach(r => { activityData[r.date] = r.count; });
-}
-
-async function recordActivity() {
-  const today = todayStr();
-  const current = activityData[today] || 0;
-  const next = current + 1;
-  const { error } = await sb.from('activity').upsert({ profile, date: today, count: next });
-  if (!error) {
-    activityData[today] = next;
-    const chartSection = document.getElementById('chartSection');
-    if (chartSection && !chartSection.classList.contains('hidden')) renderHeatmap();
-  }
-}
-
-function renderHeatmap() {
-  const grid = document.getElementById('heatmapGrid');
-  const monthsEl = document.getElementById('heatmapMonths');
-  if (!grid) return;
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const dayOfWeek = today.getDay(); // 0=Sun
-
-  // End on today, start 13 weeks back from the Sunday of today's week
-  const startAdj = new Date(today);
-  startAdj.setDate(startAdj.getDate() - dayOfWeek - (13 * 7 - 7));
-
-  const totalDays = 13 * 7 - (6 - dayOfWeek); // partial last week ends today
-
-  const maxCount = Math.max(1, ...Object.values(activityData));
-
-  let weeks = [];
-  let currentWeek = [];
-  let monthLabels = [];
-  let lastMonth = -1;
-  let weekIndex = 0;
-
-  for (let i = 0; i < totalDays; i++) {
-    const d = new Date(startAdj);
-    d.setDate(d.getDate() + i);
-    const dateStr = d.toISOString().split('T')[0];
-    const count = activityData[dateStr] || 0;
-    const level = count === 0 ? 0 : count <= maxCount * 0.33 ? 1 : count <= maxCount * 0.66 ? 2 : 3;
-    const month = d.getMonth();
-    const label = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-    const tip = count > 0 ? `${label}: ${count} card${count !== 1 ? 's' : ''}` : label;
-
-    if (d.getDay() === 0 && currentWeek.length > 0) {
-      weeks.push(currentWeek);
-      currentWeek = [];
-      weekIndex++;
-    }
-
-    if (month !== lastMonth && d <= today) {
-      monthLabels.push({ weekIndex, label: d.toLocaleDateString(undefined, { month: 'short' }) });
-      lastMonth = month;
-    }
-
-    const isFuture = d > today;
-    currentWeek.push({ dateStr, count, level, tip, isFuture });
-  }
-  if (currentWeek.length > 0) weeks.push(currentWeek);
-
-  grid.innerHTML = weeks.map(week => `
-    <div class="heatmap-week">
-      ${week.map(day => day.isFuture
-        ? `<div class="heatmap-day" style="opacity:0.2"></div>`
-        : `<div class="heatmap-day" data-count="${day.count}" data-level="${day.level}" data-tip="${day.tip}"></div>`
-      ).join('')}
-    </div>
-  `).join('');
-
-  // Month labels
-  const weekWidth = 15; // 12px cell + 3px gap
-  monthsEl.innerHTML = monthLabels.map((m, i) => {
-    const nextX = i + 1 < monthLabels.length ? monthLabels[i + 1].weekIndex * weekWidth : weeks.length * weekWidth;
-    const width = nextX - m.weekIndex * weekWidth;
-    return `<div class="heatmap-month-label" style="width:${width}px;">${m.label}</div>`;
+  el.innerHTML = history.map(h => {
+    const date = new Date(h.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    return `
+      <div class="history-item">
+        <div class="history-top">
+          <span class="history-result ${h.pass ? 'pass' : 'fail'}">${h.pass ? '👍 Pass' : '👎 Try again'}</span>
+          <span class="history-meta">${h.level} · Rung ${h.rung} · ${date}</span>
+        </div>
+        <p class="history-prompt">${escapeHtml(h.prompt)}</p>
+      </div>
+    `;
   }).join('');
 }
 
-document.getElementById('editCancelBtn').addEventListener('click', closeEditModal);
-document.getElementById('editSaveBtn').addEventListener('click', saveEditedCard);
-document.getElementById('editOverlay').addEventListener('click', (e) => {
-  if (e.target.id === 'editOverlay') closeEditModal();
+// ── Dark mode ─────────────────────────────────────────────
+function applyDarkMode(dark) {
+  document.body.classList.toggle('dark-mode', dark);
+  document.getElementById('darkModeToggle').textContent = dark ? '☀️' : '🌙';
+  try { localStorage.setItem('spiel-dark-mode', dark ? '1' : '0'); } catch (e) {}
+}
+
+document.getElementById('darkModeToggle').addEventListener('click', () => {
+  const isDark = document.body.classList.contains('dark-mode');
+  applyDarkMode(!isDark);
 });
 
-// Edit profile
-let editingProfileName = null;
-let editingProfileEmoji = null;
-let editingProfileColor = null;
-
-function renderEditEmojiPicker() {
-  const el = document.getElementById('editEmojiPicker');
-  el.innerHTML = EMOJI_OPTIONS.map(e =>
-    `<button type="button" data-emoji="${e}" class="${e === editingProfileEmoji ? 'selected' : ''}">${e}</button>`
-  ).join('');
-  el.querySelectorAll('button').forEach(b => {
-    b.addEventListener('click', () => {
-      editingProfileEmoji = b.dataset.emoji;
-      renderEditEmojiPicker();
-    });
-  });
-  renderColorSwatch('editColorPicker', editingProfileColor || THEME_COLORS[0], (c) => {
-    editingProfileColor = c;
-    renderEditEmojiPicker();
-  });
+function initDarkMode() {
+  let saved = '1';
+  try { saved = localStorage.getItem('spiel-dark-mode') ?? '1'; } catch (e) {}
+  applyDarkMode(saved === '1');
 }
 
-function openEditProfileModal(name, emoji, color) {
-  editingProfileName = name;
-  editingProfileEmoji = emoji || EMOJI_OPTIONS[0];
-  editingProfileColor = color || THEME_COLORS[0];
-  document.getElementById('editProfileName').value = name;
-  renderEditEmojiPicker();
-  document.getElementById('editProfileOverlay').classList.remove('hidden');
-}
-
-function closeEditProfileModal() {
-  editingProfileName = null;
-  document.getElementById('editProfileOverlay').classList.add('hidden');
-}
-
-async function saveEditedProfile() {
-  const newName = document.getElementById('editProfileName').value.trim();
-  if (!newName || !editingProfileName) return;
-  const oldName = editingProfileName;
-  const newEmoji = editingProfileEmoji;
-  const newColor = editingProfileColor;
-
-  if (newName !== oldName) {
-    const { error: cardErr } = await sb.from('cards').update({ profile: newName }).eq('profile', oldName);
-    if (cardErr) { setStatus('Could not rename: ' + cardErr.message, true); return; }
-    const { error: actErr } = await sb.from('activity').update({ profile: newName }).eq('profile', oldName);
-    if (actErr) { setStatus('Could not rename activity: ' + actErr.message, true); return; }
-  }
-
-  await sb.from('streaks').delete().eq('profile', oldName);
-  await sb.from('streaks').upsert({ profile: newName, avatar_emoji: newEmoji, theme_color: newColor });
-
-  if (profile === oldName) {
-    profile = newName;
-    currentAvatar = { emoji: newEmoji, theme_color: newColor };
-    try { localStorage.setItem('vokabelkarten-profile', profile); } catch (e) {}
-    document.getElementById('profileLabel').innerHTML = avatarChip(newEmoji) + escapeHtml(profile);
-    applyProfileTheme(newColor);
-  }
-
-  closeEditProfileModal();
-  setStatus('Profile updated.');
-  showProfilePicker();
-}
-
-document.getElementById('editProfileCancelBtn').addEventListener('click', closeEditProfileModal);
-document.getElementById('editProfileSaveBtn').addEventListener('click', saveEditedProfile);
-document.getElementById('editProfileOverlay').addEventListener('click', (e) => {
-  if (e.target.id === 'editProfileOverlay') closeEditProfileModal();
-});
-
-const EMOJI_OPTIONS = ['🍀','🐶','🐻','🐝','🦕','🪴','🌄'];
-const THEME_COLORS = ['#3A5A78','#B5564A','#C99A3B','#5B8BAE','#9C6ADE','#E07A5F','#4A9D8A','#D4518A'];
-
-let selectedEmoji = EMOJI_OPTIONS[0];
-let selectedThemeColor = THEME_COLORS[0];
-
-function renderColorSwatch(containerId, current, onChange) {
-  const el = document.getElementById(containerId);
-  if (!el) return;
-  el.innerHTML = THEME_COLORS.map(c =>
-    `<button type="button" data-color="${c}" class="${c === current ? 'selected' : ''}" style="background:${c};"></button>`
-  ).join('');
-  el.querySelectorAll('button').forEach(b => {
-    b.addEventListener('click', () => { onChange(b.dataset.color); });
-  });
-}
-
+// ── Profile picker ────────────────────────────────────────
 function renderAvatarPickers() {
   const emojiEl = document.getElementById('emojiPicker');
   emojiEl.innerHTML = EMOJI_OPTIONS.map(e =>
     `<button type="button" data-emoji="${e}" class="${e === selectedEmoji ? 'selected' : ''}">${e}</button>`
   ).join('');
   emojiEl.querySelectorAll('button').forEach(b => {
-    b.addEventListener('click', () => {
-      selectedEmoji = b.dataset.emoji;
-      renderAvatarPickers();
-    });
+    b.addEventListener('click', () => { selectedEmoji = b.dataset.emoji; renderAvatarPickers(); });
   });
-  renderColorSwatch('colorPicker', selectedThemeColor, (c) => {
-    selectedThemeColor = c;
-    renderAvatarPickers();
+
+  const colorEl = document.getElementById('colorPicker');
+  colorEl.innerHTML = THEME_COLORS.map(c =>
+    `<button type="button" data-color="${c}" class="${c === selectedColor ? 'selected' : ''}" style="background:${c};"></button>`
+  ).join('');
+  colorEl.querySelectorAll('button').forEach(b => {
+    b.addEventListener('click', () => { selectedColor = b.dataset.color; renderAvatarPickers(); });
   });
 }
 
-function avatarChip(emoji) {
-  return `<span class="avatar-chip" style="background:var(--accent-soft);">${emoji || ''}</span>`;
-}
-
-function applyProfileTheme(color) {
-  if (!color) return;
-  document.documentElement.style.setProperty('--accent', color);
-  // derive soft version by adding opacity
-  document.documentElement.style.setProperty('--accent-soft', color + '22');
-  document.documentElement.style.setProperty('--btn-hover', color + 'cc');
-}
-
-async function fetchKnownProfiles() {
-  const { data: cardRows, error: cardErr } = await sb.from('cards').select('profile');
-  const { data: streakRows } = await sb.from('streaks').select('profile, avatar_emoji, theme_color');
-  if (cardErr || !cardRows) return [];
-  const names = new Set(cardRows.map(r => r.profile).filter(Boolean));
-  const avatarMap = {};
-  (streakRows || []).forEach(r => { avatarMap[r.profile] = r; });
-  return Array.from(names).map(n => ({
-    name: n,
-    emoji: avatarMap[n] ? avatarMap[n].avatar_emoji : null,
-    theme_color: avatarMap[n] ? avatarMap[n].theme_color : null
-  }));
-}
-
-async function showProfilePicker() {
-  const overlay = document.getElementById('profileOverlay');
+function showProfilePicker() {
+  const known = getKnownProfiles();
   const list = document.getElementById('profileList');
-  const known = await fetchKnownProfiles();
-  if (known.length === 0) {
-    list.innerHTML = '<p style="font-size:0.85rem; color: var(--ink-soft); margin:0;">No profiles yet — add the first name below.</p>';
-  } else {
-    list.innerHTML = known.map(p =>
-      `<div class="profile-list-row">
-        <button class="profile-pick-btn" data-profile="${escapeHtml(p.name)}">${avatarChip(p.emoji)}${escapeHtml(p.name)}${p.theme_color ? `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${p.theme_color};margin-left:6px;"></span>` : ''}</button>
-        <button class="profile-edit-icon" data-profile="${escapeHtml(p.name)}" data-emoji="${escapeHtml(p.emoji || '')}" data-color="${escapeHtml(p.theme_color || '')}" aria-label="Edit profile" title="Edit"><i class="ti ti-pencil"></i></button>
-      </div>`
-    ).join('');
-    list.querySelectorAll('.profile-pick-btn').forEach(b => {
-      b.addEventListener('click', () => selectProfile(b.dataset.profile));
+  list.innerHTML = known.map(p => `
+    <div class="profile-list-row">
+      <button class="profile-pick-btn" data-profile="${escapeHtml(p.name)}">${avatarChip(p.emoji)} ${escapeHtml(p.name)}</button>
+      <button class="profile-edit-icon" data-profile="${escapeHtml(p.name)}" data-emoji="${escapeHtml(p.emoji || '')}" data-color="${escapeHtml(p.color || '')}" aria-label="Edit">✏️</button>
+    </div>
+  `).join('');
+  list.querySelectorAll('.profile-pick-btn').forEach(b => {
+    b.addEventListener('click', () => selectProfile(b.dataset.profile));
+  });
+  list.querySelectorAll('.profile-edit-icon').forEach(b => {
+    b.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openEditProfileModal(b.dataset.profile, b.dataset.emoji, b.dataset.color);
     });
-    list.querySelectorAll('.profile-edit-icon').forEach(b => {
-      b.addEventListener('click', (e) => {
-        e.stopPropagation();
-        openEditProfileModal(b.dataset.profile, b.dataset.emoji, b.dataset.color);
-      });
-    });
-  }
+  });
+  selectedEmoji = EMOJI_OPTIONS[Math.floor(Math.random() * EMOJI_OPTIONS.length)];
+  selectedColor = THEME_COLORS[Math.floor(Math.random() * THEME_COLORS.length)];
   renderAvatarPickers();
-  overlay.classList.remove('hidden');
+  document.getElementById('newProfileInput').value = '';
+  document.getElementById('profileOverlay').classList.remove('hidden');
 }
 
-let currentAvatar = { emoji: null, theme_color: null };
-
-async function selectProfile(name) {
+function selectProfile(name) {
   name = name.trim();
   if (!name) return;
-  const isNew = !(await fetchKnownProfiles()).some(p => p.name === name);
-  profile = name;
-  try { localStorage.setItem('vokabelkarten-profile', profile); } catch (e) {}
-  document.getElementById('profileOverlay').classList.add('hidden');
-  cards = await fetchCards();
-  await fetchStreak();
-  await fetchActivity();
-  if (isNew) {
-    currentAvatar = { emoji: selectedEmoji, theme_color: selectedThemeColor };
-    await sb.from('streaks').upsert({ profile, avatar_emoji: selectedEmoji, theme_color: selectedThemeColor });
+  const known = getKnownProfiles();
+  const existing = known.find(p => p.name === name);
+  if (existing) {
+    currentAvatar = { emoji: existing.emoji, color: existing.color };
   } else {
-    const { data } = await sb.from('streaks').select('avatar_emoji, theme_color').eq('profile', profile).maybeSingle();
-    currentAvatar = { emoji: data ? data.avatar_emoji : null, theme_color: data ? data.theme_color : null };
+    currentAvatar = { emoji: selectedEmoji, color: selectedColor };
+    upsertKnownProfile(name, selectedEmoji, selectedColor);
   }
-  applyProfileTheme(currentAvatar.theme_color);
-  document.getElementById('profileLabel').innerHTML = avatarChip(currentAvatar.emoji) + escapeHtml(profile);
-  practiceFilter = null;
-  dueQueue = [];
-  currentCard = null;
-  pendingChallenges = [];
-  pendingChallengeIndex = 0;
-  updateChallengeBadge();
-  if (incomingChannel) { sb.removeChannel(incomingChannel); incomingChannel = null; }
-  flipped = false;
-  reverseMode = false;
-  typeMode = false;
-  document.getElementById('reverseModeBtn').classList.remove('active');
-  document.getElementById('typeModeBtn').classList.remove('active');
-  document.body.classList.toggle('no-grading-profile', isFunPhraseProfile());
-  if (isFunPhraseProfile()) {
-    await applyMode(true);
-  }
-  render();
-  fetchWordOfDay();
-  if (cards.length === 0) setStatus('');
+  profile = name;
+  try { localStorage.setItem('spiel-current-profile', profile); } catch (e) {}
+  document.getElementById('profileOverlay').classList.add('hidden');
+  document.getElementById('profileLabel').innerHTML = avatarChip(currentAvatar.emoji) + ' ' + escapeHtml(profile);
+  applyProfileTheme(currentAvatar.color);
+
+  let savedLevel = 'A1';
+  try { savedLevel = localStorage.getItem(profileKey('level')) || 'A1'; } catch (e) {}
+  currentLevel = savedLevel;
+  currentRung = getRungFor(currentLevel);
+  renderHome();
+  show('homeScreen');
 }
 
 document.getElementById('profileGoBtn').addEventListener('click', () => {
   const input = document.getElementById('newProfileInput');
   const name = input.value.trim();
-  if (name) {
-    input.value = '';
-    selectProfile(name);
-  }
+  if (name) selectProfile(name);
 });
-
 document.getElementById('newProfileInput').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') document.getElementById('profileGoBtn').click();
 });
@@ -2890,204 +1395,94 @@ document.getElementById('switchProfileLink').addEventListener('click', (e) => {
   showProfilePicker();
 });
 
-// ── Reverse mode & Typing mode ───────────────────────────
-let reverseMode = false;
-let typeMode = false;
-let typingAnswered = false;
+// ── Edit profile ──────────────────────────────────────────
+let editingProfileName = null;
+let editingEmoji = null;
+let editingColor = null;
 
-document.getElementById('reverseModeBtn').addEventListener('click', () => {
-  reverseMode = !reverseMode;
-  document.getElementById('reverseModeBtn').classList.toggle('active', reverseMode);
-  flipped = false;
-  render();
+function renderEditPickers() {
+  const emojiEl = document.getElementById('editEmojiPicker');
+  emojiEl.innerHTML = EMOJI_OPTIONS.map(e =>
+    `<button type="button" data-emoji="${e}" class="${e === editingEmoji ? 'selected' : ''}">${e}</button>`
+  ).join('');
+  emojiEl.querySelectorAll('button').forEach(b => {
+    b.addEventListener('click', () => { editingEmoji = b.dataset.emoji; renderEditPickers(); });
+  });
+
+  const colorEl = document.getElementById('editColorPicker');
+  colorEl.innerHTML = THEME_COLORS.map(c =>
+    `<button type="button" data-color="${c}" class="${c === editingColor ? 'selected' : ''}" style="background:${c};"></button>`
+  ).join('');
+  colorEl.querySelectorAll('button').forEach(b => {
+    b.addEventListener('click', () => { editingColor = b.dataset.color; renderEditPickers(); });
+  });
+}
+
+function openEditProfileModal(name, emoji, color) {
+  editingProfileName = name;
+  editingEmoji = emoji || EMOJI_OPTIONS[0];
+  editingColor = color || THEME_COLORS[0];
+  document.getElementById('editProfileName').value = name;
+  renderEditPickers();
+  document.getElementById('editProfileOverlay').classList.remove('hidden');
+}
+
+document.getElementById('editProfileCancelBtn').addEventListener('click', () => {
+  document.getElementById('editProfileOverlay').classList.add('hidden');
 });
 
-document.getElementById('typeModeBtn').addEventListener('click', () => {
-  typeMode = !typeMode;
-  document.getElementById('typeModeBtn').classList.toggle('active', typeMode);
-  flipped = false;
-  typingAnswered = false;
-  render();
-});
+document.getElementById('editProfileSaveBtn').addEventListener('click', () => {
+  const newName = document.getElementById('editProfileName').value.trim();
+  if (!newName || !editingProfileName) return;
+  const oldName = editingProfileName;
 
-function showTypeInput(show) {
-  const row = document.getElementById('typeInputRow');
-  if (show) {
-    row.style.display = 'block';
-    row.classList.remove('hidden');
-    document.getElementById('typeInput').value = '';
-    document.getElementById('typeResult').classList.add('hidden');
-    typingAnswered = false;
-  } else {
-    row.style.display = 'none';
-  }
-}
-
-document.getElementById('typeForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  if (!currentCard || typingAnswered) return;
-  const typedRaw = document.getElementById('typeInput').value.trim();
-  const typed = typedRaw.toLowerCase();
-  const expected = (reverseMode ? currentCard.front : currentCard.back).toLowerCase();
-  const correct = typed === expected;
-  const result = document.getElementById('typeResult');
-  result.textContent = correct ? `✓ Correct!` : `✗ The answer was "${reverseMode ? currentCard.front : currentCard.back}"`;
-  result.style.color = correct ? 'var(--gold)' : 'var(--red)';
-  result.classList.remove('hidden');
-  typingAnswered = true;
-  if (correct) {
-    launchConfetti(1500);
-  } else if (typedRaw.length > 0) {
-    // Save the wrong answer to the typo bank to use as a future funny quiz option
-    saveTypo(typedRaw);
-  }
-  // auto-grade after typing
-  setTimeout(() => {
-    grade(currentCard, correct ? 3 : 1);
-    showTypeInput(true);
-  }, 1200);
-});
-
-async function saveTypo(text) {
-  try {
-    await sb.from('typo_bank').insert({ text });
-  } catch (e) {}
-}
-
-// ── Mastered cards ────────────────────────────────────────
-let masteredMode = false;
-
-document.getElementById('masteredBtn').addEventListener('click', () => {
-  masteredMode = !masteredMode;
-  document.getElementById('masteredBtn').classList.toggle('active', masteredMode);
-  flipped = false;
-  currentCard = null;
-  render();
-});
-
-function getMasteredCards() {
-  return cards.filter(c => c.mastered);
-}
-
-function getNonMasteredDueCards() {
-  return cards.filter(c => !c.mastered && c.due <= now());
-}
-
-document.getElementById('masteredOkBtn').addEventListener('click', () => {
-  document.getElementById('masteredOverlay').classList.add('hidden');
-});
-
-// ── Word of the day ───────────────────────────────────────
-async function fetchWordOfDay() {
-  const today = todayStr();
-  const { data: existing } = await sb.from('word_of_day').select('*').eq('date', today).maybeSingle();
-  if (existing) {
-    showWordOfDay(existing.front, existing.back);
-    return;
-  }
-  // Pick from consolidated all-cards pool
-  const { data: allC } = await sb.from('cards').select('id, front, back');
-  if (!allC || allC.length === 0) return;
-  const pick = allC[Math.floor(Math.random() * allC.length)];
-  await sb.from('word_of_day').upsert({ date: today, card_id: pick.id, front: pick.front, back: pick.back });
-  showWordOfDay(pick.front, pick.back);
-}
-
-function showWordOfDay(front, back) {
-  const el = document.getElementById('wordOfDay');
-  document.getElementById('wodFront').textContent = front;
-  document.getElementById('wodBack').textContent = '— ' + back;
-  el.classList.remove('hidden');
-}
-
-// ── Challenge history ─────────────────────────────────────
-async function showChallengeHistory() {
-  const { data } = await sb.from('challenges')
-    .select('*')
-    .or(`created_by.eq.${profile},invited.eq.${profile}`)
-    .order('created_at', { ascending: false })
-    .limit(30);
-
-  const body = document.getElementById('historyBody');
-  if (!data || data.length === 0) {
-    body.innerHTML = '<p style="color:var(--ink-soft);font-size:0.85rem;text-align:center;padding:1rem;">No challenge history yet.</p>';
-  } else {
-    body.innerHTML = data.map(c => {
-      const isChallenger = c.created_by === profile;
-      const opponent = isChallenger ? c.invited : c.created_by;
-      const won = c.winner === profile;
-      const date = new Date(c.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-      let result = '';
-      if (c.status === 'answered') {
-        result = won ? `<span class="history-win">Won</span>` : `<span class="history-loss">Lost</span>`;
-      } else {
-        result = `<span style="color:var(--ink-soft)">Pending</span>`;
+  if (newName !== oldName) {
+    // Move ladder/history/level data to new key
+    ['ladder','history','level'].forEach(suffix => {
+      const oldVal = localStorage.getItem(`spiel-${suffix}-${oldName}`);
+      if (oldVal !== null) {
+        localStorage.setItem(`spiel-${suffix}-${newName}`, oldVal);
+        localStorage.removeItem(`spiel-${suffix}-${oldName}`);
       }
-      return `<div class="history-item">
-        <div>
-          <div style="font-weight:500;">${isChallenger ? '⚡ You → ' : '🎯 '}${escapeHtml(opponent)}</div>
-          <div style="font-size:0.75rem;color:var(--ink-soft);">${date}</div>
-        </div>
-        <div>${result}</div>
-      </div>`;
-    }).join('');
+    });
+    const known = getKnownProfiles().filter(p => p.name !== oldName);
+    saveKnownProfiles(known);
   }
-  document.getElementById('historyOverlay').classList.remove('hidden');
-}
 
-document.getElementById('historyBtn').addEventListener('click', showChallengeHistory);
-document.getElementById('historyCloseBtn').addEventListener('click', () => {
-  document.getElementById('historyOverlay').classList.add('hidden');
+  upsertKnownProfile(newName, editingEmoji, editingColor);
+
+  if (profile === oldName) {
+    profile = newName;
+    currentAvatar = { emoji: editingEmoji, color: editingColor };
+    try { localStorage.setItem('spiel-current-profile', profile); } catch (e) {}
+    document.getElementById('profileLabel').innerHTML = avatarChip(editingEmoji) + ' ' + escapeHtml(profile);
+    applyProfileTheme(editingColor);
+  }
+
+  document.getElementById('editProfileOverlay').classList.add('hidden');
+  showProfilePicker();
 });
 
-// ── Funny wrong answers (sourced from real typos people made) ───────
-let typoBank = [];
-
-async function fetchTypoBank() {
-  const { data } = await sb.from('typo_bank').select('text').order('created_at', { ascending: false }).limit(200);
-  typoBank = (data || []).map(r => r.text);
-}
-
-function getQuizOptions(correctAnswer, pool, count = 4) {
-  const wrongs = pool.filter(c => c.back !== correctAnswer);
-  const options = [correctAnswer];
-  // 1 in 5 chance of a funny answer pulled from real past typos
-  if (Math.random() < 0.2 && count === 4 && typoBank.length > 0) {
-    const funny = typoBank[Math.floor(Math.random() * typoBank.length)];
-    if (funny && !options.includes(funny)) options.push(funny);
-  }
-  const shuffledWrongs = [...wrongs].sort(() => Math.random() - 0.5);
-  for (const w of shuffledWrongs) {
-    if (options.length >= count) break;
-    if (!options.includes(w.back)) options.push(w.back);
-  }
-  while (options.length < count) options.push('—');
-  return options.sort(() => Math.random() - 0.5);
-}
-
-(async function init() {
+// ── Init ──────────────────────────────────────────────────
+initDarkMode();
+(function init() {
   let saved = '';
-  try { saved = localStorage.getItem('vokabelkarten-profile') || ''; } catch (e) {}
-  if (saved) {
-    await selectProfile(saved);
-    await checkPendingChallenge();
+  try { saved = localStorage.getItem('spiel-current-profile') || ''; } catch (e) {}
+  if (saved && getKnownProfiles().some(p => p.name === saved)) {
+    selectProfile(saved);
   } else {
-    await showProfilePicker();
+    showProfilePicker();
   }
 })();
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('service-worker.js').then((reg) => {
-      // Check for a new version whenever the app becomes visible again
       document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible') {
-          reg.update().catch(() => {});
-        }
+        if (document.visibilityState === 'visible') reg.update().catch(() => {});
       });
     }).catch(() => {});
 
-    // If a new service worker takes over, reload to get the latest files
     let refreshed = false;
     navigator.serviceWorker.addEventListener('controllerchange', () => {
       if (refreshed) return;
@@ -3097,27 +1492,20 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-// Re-check pending challenges and reconnect Realtime whenever the app
-// comes back to the foreground (mobile often suspends the WebSocket
-// connection in the background, so it needs to be re-established).
-document.addEventListener('visibilitychange', () => {
-  const pickerOpen = !document.getElementById('profileOverlay').classList.contains('hidden');
-  if (document.visibilityState === 'visible' && profile && !pickerOpen) {
-    checkPendingChallenge();
-  }
-});
-
-// ── iOS install prompt ────────────────────────────────────
+// iOS install button
 (function() {
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
   const isStandalone = window.navigator.standalone === true ||
     window.matchMedia('(display-mode: standalone)').matches;
   if (isIOS && !isStandalone) {
-    const btn = document.getElementById('iosInstallBtn');
-    btn.classList.remove('hidden');
+    const btn = document.createElement('button');
+    btn.textContent = '⬇️ Add to Home Screen';
+    btn.style.cssText = "display:flex;align-items:center;justify-content:center;gap:6px;width:100%;margin-top:1.2rem;font-family:'Fraunces',serif;font-size:0.9rem;font-weight:600;background:var(--accent);color:white;border:none;border-radius:14px;padding:0.7rem;cursor:pointer;box-shadow:0 3px 0 var(--accent-shadow);";
     btn.addEventListener('click', () => {
-      alert('To install: tap the Share button (square with an arrow) in Safari\'s toolbar, then choose "Add to Home Screen."');
+      alert('To install: tap the Share button in Safari\'s toolbar, then choose "Add to Home Screen."');
     });
+    const footer = document.querySelector('#homeScreen footer');
+    if (footer) footer.parentNode.insertBefore(btn, footer);
   }
 })();
 </script>
