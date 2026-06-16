@@ -499,16 +499,22 @@
   }
 
   .result-tip {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0 0 1.5rem;
+  }
+
+  .result-tip-line {
     font-size: 0.85rem;
     color: var(--ink);
     background: var(--accent-soft);
     border-radius: 12px;
     padding: 0.6rem 0.9rem;
-    margin: 0 0 1.5rem;
     text-align: left;
   }
 
-  .result-tip.pass { background: var(--mint-soft); }
+  .result-tip.pass .result-tip-line { background: var(--mint-soft); }
 
   .result-tip.hidden { display: none; }
 
@@ -922,7 +928,7 @@
     <div id="resultBadge" class="result-badge"></div>
     <p class="result-title" id="resultTitle"></p>
     <p class="result-sub" id="resultSub"></p>
-    <p class="result-tip" id="resultTip"></p>
+    <div class="result-tip" id="resultTip"></div>
 
     <div class="result-stats" id="resultStats"></div>
 
@@ -1791,14 +1797,26 @@ function renderResult() {
         const usedConnector = CONNECTOR_WORDS.find(cw => transcriptWords.includes(cw));
         if (usedConnector) praise = `You linked your ideas well using "${usedConnector}".`;
       }
-      tipEl.textContent = praise ? `✨ ${praise}` : '';
+      tipEl.innerHTML = praise ? `<div class="result-tip-line">✨ ${praise}</div>` : '';
       tipEl.classList.toggle('hidden', !praise);
       tipEl.classList.toggle('pass', true);
     } else {
-      const weakest = lastResult.criteria.reduce((min, c) => c.score < min.score ? c : min, lastResult.criteria[0]);
-      const tip = CRITERIA_TIPS[weakest.key];
-      tipEl.textContent = tip ? `💡 ${tip}` : '';
-      tipEl.classList.toggle('hidden', !tip);
+      // Show a tip for every criterion that fell below this level's passing
+      // floor, not just the single weakest — if vocab failed, you should
+      // hear about vocab specifically, even if something else also failed.
+      const floor = currentLevel === 'B1' ? 70 : 60;
+      let failing = lastResult.criteria.filter(c => c.score < floor);
+      // If nothing technically fell below the floor (e.g. failed only on
+      // the overall-score threshold), still surface the single weakest one.
+      if (failing.length === 0) {
+        failing = [lastResult.criteria.reduce((min, c) => c.score < min.score ? c : min, lastResult.criteria[0])];
+      }
+      const lines = failing
+        .map(c => CRITERIA_TIPS[c.key])
+        .filter(Boolean)
+        .map(tip => `<div class="result-tip-line">💡 ${tip}</div>`);
+      tipEl.innerHTML = lines.join('');
+      tipEl.classList.toggle('hidden', lines.length === 0);
       tipEl.classList.toggle('pass', false);
     }
   } else {
