@@ -1191,9 +1191,41 @@ function show(id) {
   });
 }
 
+function getRecentPromptsKey(level, rung) {
+  return `spiel-recent-${profile}-${level}-${rung}`;
+}
+
+function getRecentPrompts(level, rung) {
+  try {
+    return JSON.parse(localStorage.getItem(getRecentPromptsKey(level, rung)) || '[]');
+  } catch (e) {
+    return [];
+  }
+}
+
+function rememberPrompt(level, rung, prompt) {
+  const options = PROMPT_BANK[level].rungs[rung];
+  let recent = getRecentPrompts(level, rung);
+  recent.push(prompt);
+  // Keep at most (pool size - 1) remembered, so there's always at least one
+  // fresh option left to pick from; older entries fall off first.
+  const keepCount = Math.max(1, options.length - 1);
+  recent = recent.slice(-keepCount);
+  try {
+    localStorage.setItem(getRecentPromptsKey(level, rung), JSON.stringify(recent));
+  } catch (e) {}
+}
+
 function pickPrompt(level, rung) {
   const options = PROMPT_BANK[level].rungs[rung];
-  return options[Math.floor(Math.random() * options.length)];
+  const recent = getRecentPrompts(level, rung);
+  let pool = options.filter(p => !recent.includes(p));
+  // If everything in this rung has been shown recently (small pool), just
+  // use the full set rather than getting stuck with nothing to pick from.
+  if (pool.length === 0) pool = options;
+  const chosen = pool[Math.floor(Math.random() * pool.length)];
+  rememberPrompt(level, rung, chosen);
+  return chosen;
 }
 
 // ── Home screen ───────────────────────────────────────────
