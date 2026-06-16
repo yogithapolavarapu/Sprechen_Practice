@@ -525,6 +525,84 @@
     font-weight: 700;
   }
 
+  .criteria-box {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 1rem 1.1rem;
+    text-align: left;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 3px 0 var(--shadow);
+  }
+
+  .criteria-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .criteria-row:last-child { border-bottom: none; }
+
+  .criteria-info { flex: 1; min-width: 0; }
+
+  .criteria-name {
+    font-family: 'Fraunces', serif;
+    font-size: 0.92rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .criteria-desc {
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+    margin: 1px 0 0;
+  }
+
+  .criteria-bar-wrap {
+    width: 70px;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--border);
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .criteria-bar-fill {
+    height: 100%;
+    border-radius: 999px;
+  }
+
+  .criteria-tier {
+    font-size: 0.72rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    width: 76px;
+    text-align: right;
+  }
+
+  .overall-score-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+  }
+
+  .overall-score-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .overall-score-val {
+    font-family: 'Fraunces', serif;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--accent);
+  }
+
   .transcript-box {
     background: var(--card);
     border-radius: 16px;
@@ -836,6 +914,8 @@
 
     <div class="result-stats" id="resultStats"></div>
 
+    <div class="criteria-box" id="criteriaBox"></div>
+
     <div class="transcript-box">
       <p class="tb-label">The prompt</p>
       <p id="resultPromptOriginal"></p>
@@ -957,6 +1037,7 @@ let recognition = null;
 let isRecording = false;
 let finalTranscript = '';
 let interimTranscript = '';
+let speechTimestamps = [];
 let sessionStartTime = null;
 let timerInterval = null;
 let elapsedSeconds = 0;
@@ -1154,6 +1235,7 @@ document.getElementById('historyBackBtn').addEventListener('click', () => show('
 function startGame() {
   finalTranscript = '';
   interimTranscript = '';
+  speechTimestamps = [];
   elapsedSeconds = 0;
   isRecording = false;
 
@@ -1207,8 +1289,12 @@ function startRecording() {
       let interim = '';
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const piece = event.results[i][0].transcript;
-        if (event.results[i].isFinal) finalTranscript += piece + ' ';
-        else interim += piece;
+        if (event.results[i].isFinal) {
+          finalTranscript += piece + ' ';
+          speechTimestamps.push(Date.now());
+        } else {
+          interim += piece;
+        }
       }
       interimTranscript = interim;
       updateLiveWords();
@@ -1255,6 +1341,7 @@ document.getElementById('micBtn').addEventListener('click', () => {
   } else {
     finalTranscript = '';
     interimTranscript = '';
+    speechTimestamps = [];
     document.getElementById('liveWords').textContent = 'Listening…';
     document.getElementById('liveWords').classList.remove('has-text');
     document.getElementById('discardBtn').classList.add('hidden');
@@ -1266,6 +1353,7 @@ document.getElementById('micBtn').addEventListener('click', () => {
 document.getElementById('discardBtn').addEventListener('click', () => {
   finalTranscript = '';
   interimTranscript = '';
+  speechTimestamps = [];
   document.getElementById('liveWords').textContent = 'Tap the mic and start talking…';
   document.getElementById('liveWords').classList.remove('has-text');
   document.getElementById('discardBtn').classList.add('hidden');
@@ -1277,8 +1365,32 @@ document.getElementById('finishBtn').addEventListener('click', () => {
   scoreRound();
 });
 
-// ── Scoring ───────────────────────────────────────────────
+// ── Scoring (inspired by Goethe-Institut's Sprechen Bewertungskriterien) ──
 const FILLER_WORDS = ['äh','ähm','also','halt','irgendwie','sozusagen'];
+const CONNECTOR_WORDS = ['und','aber','weil','deshalb','dann','trotzdem','außerdem','denn','also','oder','wenn','obwohl','sondern','während','damit','dadurch','deswegen','allerdings','dafür','dagegen'];
+
+// Minimum words expected per rung, tuned per level (B1 expects more than A1 at the same rung number)
+const MIN_WORDS = {
+  A1: { 1: 4,  2: 6,  3: 9,  4: 13, 5: 17 },
+  A2: { 1: 6,  2: 9,  3: 13, 4: 18, 5: 24 },
+  B1: { 1: 9,  2: 13, 3: 18, 4: 24, 5: 32 }
+};
+
+// Expected distinct-vocabulary ratio (unique words / total words), tuned per level.
+// Lower levels are allowed to repeat words more; B1 is expected to vary vocabulary more.
+const VOCAB_TARGET_RATIO = { A1: 0.45, A2: 0.55, B1: 0.65 };
+
+const TIERS = [
+  { min: 90, label: 'Stark', sub: 'angemessen' },
+  { min: 70, label: 'Gut', sub: 'überwiegend angemessen' },
+  { min: 50, label: 'Okay', sub: 'in Teilen angemessen' },
+  { min: 25, label: 'Ausbaufähig', sub: 'nicht mehr angemessen' },
+  { min: 0,  label: 'Schwach', sub: 'nicht mehr verständlich' }
+];
+
+function tierFor(score) {
+  return TIERS.find(t => score >= t.min) || TIERS[TIERS.length - 1];
+}
 
 function scoreRound() {
   const transcript = (finalTranscript + interimTranscript).trim();
@@ -1286,12 +1398,56 @@ function scoreRound() {
   const wordCount = words.length;
   const limit = getEffectiveTimeLimit();
   const duration = Math.max(1, elapsedSeconds);
-  const wpm = Math.round((wordCount / duration) * 60);
+  const wpm = wordCount > 0 ? Math.round((wordCount / duration) * 60) : 0;
   const fillerCount = words.filter(w => FILLER_WORDS.includes(w.toLowerCase().replace(/[.,!?]/g, ''))).length;
 
-  // Simple pass threshold: enough words spoken relative to rung expectations
-  const minWordsForRung = { 1: 4, 2: 6, 3: 10, 4: 14, 5: 18 };
-  const suggestedPass = wordCount >= minWordsForRung[selectedRung] && wpm >= 25;
+  const minWords = MIN_WORDS[currentLevel][selectedRung];
+
+  // 1. Aufgabenerfüllung (Task fulfillment) — did you say enough to actually engage with the prompt?
+  const fulfillmentRatio = wordCount / minWords;
+  const taskFulfillment = Math.round(Math.min(100, fulfillmentRatio * 100));
+
+  // 2. Flüssigkeit (Fluency) — pace, plus penalty for long pauses between spoken chunks
+  let longestGapSec = 0;
+  for (let i = 1; i < speechTimestamps.length; i++) {
+    const gap = (speechTimestamps[i] - speechTimestamps[i - 1]) / 1000;
+    if (gap > longestGapSec) longestGapSec = gap;
+  }
+  let fluencyScore;
+  if (wpm === 0) fluencyScore = 0;
+  else if (wpm < 40) fluencyScore = (wpm / 40) * 70;
+  else if (wpm <= 150) fluencyScore = 100;
+  else fluencyScore = Math.max(60, 100 - (wpm - 150) * 0.3);
+  const pausePenalty = Math.min(40, Math.max(0, longestGapSec - 3) * 10);
+  const fillerPenalty = wordCount > 0 ? Math.min(20, (fillerCount / wordCount) * 100) : 0;
+  fluencyScore = Math.max(0, Math.round(fluencyScore - pausePenalty - fillerPenalty));
+
+  // 3. Wortschatz (Vocabulary range) — lexical diversity vs. level-tuned target
+  const normalizedWords = words.map(w => w.toLowerCase().replace(/[.,!?]/g, '')).filter(Boolean);
+  const uniqueWords = new Set(normalizedWords);
+  const diversityRatio = normalizedWords.length > 0 ? uniqueWords.size / normalizedWords.length : 0;
+  const targetRatio = VOCAB_TARGET_RATIO[currentLevel];
+  const vocabScore = Math.round(Math.min(100, (diversityRatio / targetRatio) * 100));
+
+  // 4. Kohärenz (Coherence) — use of connecting words to link ideas
+  const connectorCount = normalizedWords.filter(w => CONNECTOR_WORDS.includes(w)).length;
+  const expectedConnectors = Math.max(1, Math.floor(wordCount / 15));
+  const coherenceScore = Math.round(Math.min(100, (connectorCount / expectedConnectors) * 100));
+
+  // 5. Korrektheit (Correctness) — can't grammar-check without a paid model call,
+  // so this is folded into an estimate based on the other four rather than faked independently.
+  const correctnessScore = Math.round((taskFulfillment + fluencyScore + vocabScore + coherenceScore) / 4);
+
+  const criteria = [
+    { key: 'erfullung', name: 'Aufgabenerfüllung', desc: 'Did you say enough to address the prompt?', score: taskFulfillment },
+    { key: 'flussigkeit', name: 'Flüssigkeit', desc: 'Pace and smoothness of speech', score: fluencyScore },
+    { key: 'wortschatz', name: 'Wortschatz', desc: 'Range of vocabulary used', score: vocabScore },
+    { key: 'koharenz', name: 'Kohärenz', desc: 'Linking ideas with connectors', score: coherenceScore },
+    { key: 'korrektheit', name: 'Korrektheit', desc: 'Estimated overall accuracy', score: correctnessScore }
+  ];
+
+  const overallScore = Math.round(criteria.reduce((s, c) => s + c.score, 0) / criteria.length);
+  const suggestedPass = overallScore >= 60;
 
   lastResult = {
     level: currentLevel,
@@ -1299,6 +1455,8 @@ function scoreRound() {
     prompt: currentPrompt,
     transcript: transcript || '(no speech detected)',
     wordCount, wpm, fillerCount, duration,
+    criteria,
+    overallScore,
     suggestedPass,
     pass: suggestedPass,
     date: new Date().toISOString()
@@ -1335,6 +1493,28 @@ function renderResult() {
     <div class="result-stat"><span class="val">${lastResult.wordCount}</span><span class="lbl">Words</span></div>
     <div class="result-stat"><span class="val">${lastResult.wpm}</span><span class="lbl">WPM</span></div>
     <div class="result-stat"><span class="val">${lastResult.duration}s</span><span class="lbl">Time</span></div>
+  `;
+
+  const tierColors = { 'Stark': 'var(--mint)', 'Gut': 'var(--accent)', 'Okay': 'var(--yellow)', 'Ausbaufähig': 'var(--coral)', 'Schwach': 'var(--coral)' };
+  document.getElementById('criteriaBox').innerHTML = `
+    <div class="overall-score-row">
+      <span class="overall-score-label">Overall score</span>
+      <span class="overall-score-val">${lastResult.overallScore}/100</span>
+    </div>
+    ${lastResult.criteria.map(c => {
+      const tier = tierFor(c.score);
+      const color = tierColors[tier.label] || 'var(--accent)';
+      return `
+        <div class="criteria-row">
+          <div class="criteria-info">
+            <p class="criteria-name">${c.name}</p>
+            <p class="criteria-desc">${c.desc}</p>
+          </div>
+          <div class="criteria-bar-wrap"><div class="criteria-bar-fill" style="width:${c.score}%; background:${color};"></div></div>
+          <span class="criteria-tier" style="color:${color};">${tier.label}</span>
+        </div>
+      `;
+    }).join('')}
   `;
 
   document.getElementById('resultPromptOriginal').textContent = lastResult.prompt;
@@ -1405,7 +1585,7 @@ function renderHistoryScreen() {
     return `
       <div class="history-item">
         <div class="history-top">
-          <span class="history-result ${h.pass ? 'pass' : 'fail'}">${h.pass ? '👍 Pass' : '👎 Try again'}</span>
+          <span class="history-result ${h.pass ? 'pass' : 'fail'}">${h.pass ? '👍' : '👎'} ${h.overallScore != null ? h.overallScore + '/100' : (h.pass ? 'Pass' : 'Try again')}</span>
           <span class="history-meta">${h.level} · Level ${h.rung} · ${date}</span>
         </div>
         <p class="history-prompt">${escapeHtml(h.prompt)}</p>
