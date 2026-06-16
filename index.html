@@ -631,28 +631,24 @@
     margin-bottom: 1.5rem;
   }
 
-  .override-label {
-    font-size: 0.85rem;
-    color: var(--ink-soft);
-    margin-bottom: 0.6rem;
-    font-weight: 700;
-  }
-
-  .thumb-btn {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    border: none;
+  .override-toggle-btn {
+    display: block;
+    width: 100%;
+    font-family: 'Fraunces', serif;
+    font-size: 0.9rem;
+    font-weight: 600;
     background: var(--card);
-    font-size: 1.5rem;
+    border: 1.5px dashed var(--border);
+    border-radius: 14px;
+    padding: 0.7rem 1rem;
     cursor: pointer;
-    box-shadow: 0 3px 0 var(--shadow);
-    transition: transform 0.1s;
+    color: var(--ink-soft);
+    margin-bottom: 1.5rem;
+    transition: all 0.15s;
   }
 
-  .thumb-btn:active { transform: translateY(2px); }
-  .thumb-btn.selected.up { background: var(--mint-soft); box-shadow: 0 3px 0 var(--mint); }
-  .thumb-btn.selected.down { background: var(--coral-soft); box-shadow: 0 3px 0 var(--coral); }
+  .override-toggle-btn:active { transform: translateY(1px); }
+  .override-toggle-btn:hover { border-color: var(--accent); color: var(--ink); }
 
   /* History */
   .history-item {
@@ -929,11 +925,7 @@
       <p id="resultTranscriptTranslation" style="color:var(--ink-soft); font-style:italic; margin-top:6px;"></p>
     </div>
 
-    <p class="override-label">You be the judge</p>
-    <div class="override-row" id="overrideRow">
-      <button class="thumb-btn down" data-pass="false">👎</button>
-      <button class="thumb-btn up" data-pass="true">👍</button>
-    </div>
+    <button class="override-toggle-btn" id="overrideToggleBtn"></button>
 
     <div class="game-actions">
       <button class="btn btn-secondary" id="retryBtn">🔁 Do it again</button>
@@ -1656,11 +1648,10 @@ function renderResult() {
     });
   }
 
-  const overrideRow = document.getElementById('overrideRow');
-  overrideRow.querySelectorAll('.thumb-btn').forEach(b => {
-    b.classList.remove('selected');
-    if ((b.dataset.pass === 'true') === lastResult.pass) b.classList.add('selected');
-  });
+  const overrideBtn = document.getElementById('overrideToggleBtn');
+  overrideBtn.textContent = lastResult.pass
+    ? '✓ Marked as Pass — tap to override to Fail'
+    : '✗ Marked as Fail — tap to override to Pass';
 
   const atFrontier = selectedRung === getRungFor(currentLevel);
   document.getElementById('nextBtn').textContent = atFrontier
@@ -1668,11 +1659,9 @@ function renderResult() {
     : 'Back to levels →';
 }
 
-document.getElementById('overrideRow').querySelectorAll('.thumb-btn').forEach(b => {
-  b.addEventListener('click', () => {
-    lastResult.pass = b.dataset.pass === 'true';
-    renderResult();
-  });
+document.getElementById('overrideToggleBtn').addEventListener('click', () => {
+  lastResult.pass = !lastResult.pass;
+  renderResult();
 });
 
 document.getElementById('resultBackBtn').addEventListener('click', () => show('homeScreen'));
