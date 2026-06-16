@@ -264,6 +264,33 @@
     text-decoration: underline;
   }
 
+  .time-picker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+    margin-bottom: 1.2rem;
+  }
+
+  .time-chip {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 999px;
+    padding: 5px 12px;
+    cursor: pointer;
+    color: var(--ink-soft);
+    transition: all 0.15s;
+  }
+
+  .time-chip.selected {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    color: var(--ink);
+  }
+
   /* Stats strip */
   .stats-strip {
     display: flex;
@@ -759,6 +786,7 @@
     <div class="challenge-card" id="challengeCard">
       <span class="challenge-rung-badge" id="challengeRungBadge"></span>
       <p class="challenge-prompt" id="challengePromptText"></p>
+      <div class="time-picker" id="timePicker"></div>
       <button class="play-btn" id="playBtn">▶ Speak now</button>
       <button class="skip-link" id="skipPromptBtn">Show a different one</button>
     </div>
@@ -809,8 +837,15 @@
     <div class="result-stats" id="resultStats"></div>
 
     <div class="transcript-box">
+      <p class="tb-label">The prompt</p>
+      <p id="resultPromptOriginal"></p>
+      <p id="resultPromptTranslation" style="color:var(--ink-soft); font-style:italic; margin-top:6px;"></p>
+    </div>
+
+    <div class="transcript-box">
       <p class="tb-label">What you said</p>
       <p id="resultTranscript"></p>
+      <p id="resultTranscriptTranslation" style="color:var(--ink-soft); font-style:italic; margin-top:6px;"></p>
     </div>
 
     <p class="override-label">You be the judge</p>
@@ -917,6 +952,7 @@ let currentLevel = 'A1';
 let currentPrompt = null;
 let currentRung = 1;
 let selectedRung = 1;
+let customTimeOverride = null; // null = use level default
 let recognition = null;
 let isRecording = false;
 let finalTranscript = '';
@@ -1046,12 +1082,38 @@ function renderLadder() {
   document.getElementById('ladderTitle').textContent = `${currentLevel} levels · playing level ${selectedRung} of ${RUNG_COUNT}`;
 }
 
+function getEffectiveTimeLimit() {
+  return customTimeOverride || TIME_PER_RUNG[selectedRung];
+}
+
+function renderTimePicker() {
+  const el = document.getElementById('timePicker');
+  const defaultTime = TIME_PER_RUNG[selectedRung];
+  const options = [10, 20, 30, 45, 60, 90].filter(t => t !== defaultTime);
+  const chips = [
+    { label: `Default (${defaultTime}s)`, value: null },
+    ...options.map(t => ({ label: `${t}s`, value: t }))
+  ];
+  el.innerHTML = chips.map(c =>
+    `<button type="button" class="time-chip ${customTimeOverride === c.value ? 'selected' : ''}" data-time="${c.value ?? ''}">${c.label}</button>`
+  ).join('');
+  el.querySelectorAll('.time-chip').forEach(b => {
+    b.addEventListener('click', () => {
+      const v = b.dataset.time;
+      customTimeOverride = v === '' ? null : parseInt(v);
+      renderTimePicker();
+    });
+  });
+}
+
 function renderChallengeCard() {
   currentPrompt = pickPrompt(currentLevel, selectedRung);
+  customTimeOverride = null;
   const badge = document.getElementById('challengeRungBadge');
   badge.textContent = `Level ${selectedRung}`;
   badge.style.background = currentAvatar.color;
   document.getElementById('challengePromptText').textContent = currentPrompt;
+  renderTimePicker();
 }
 
 function renderStats() {
@@ -1097,7 +1159,7 @@ function startGame() {
   document.getElementById('discardBtn').classList.add('hidden');
   document.getElementById('finishBtn').classList.add('hidden');
 
-  const limit = TIME_PER_RUNG[selectedRung];
+  const limit = getEffectiveTimeLimit();
   updateClock(0, limit);
 
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -1127,7 +1189,7 @@ function updateClock(elapsed, limit) {
 
 function startRecording() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  const limit = TIME_PER_RUNG[selectedRung];
+  const limit = getEffectiveTimeLimit();
 
   if (SpeechRecognition) {
     recognition = new SpeechRecognition();
@@ -1216,7 +1278,7 @@ function scoreRound() {
   const transcript = (finalTranscript + interimTranscript).trim();
   const words = transcript.split(/\s+/).filter(Boolean);
   const wordCount = words.length;
-  const limit = TIME_PER_RUNG[selectedRung];
+  const limit = getEffectiveTimeLimit();
   const duration = Math.max(1, elapsedSeconds);
   const wpm = Math.round((wordCount / duration) * 60);
   const fillerCount = words.filter(w => FILLER_WORDS.includes(w.toLowerCase().replace(/[.,!?]/g, ''))).length;
@@ -1240,6 +1302,18 @@ function scoreRound() {
   show('resultScreen');
 }
 
+async function translateText(text, fromLang, toLang) {
+  if (!text || text.trim().length === 0) return '';
+  try {
+    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${fromLang}|${toLang}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    return data?.responseData?.translatedText || '';
+  } catch (e) {
+    return '';
+  }
+}
+
 function renderResult() {
   const badge = document.getElementById('resultBadge');
   badge.className = 'result-badge ' + (lastResult.pass ? 'pass' : 'fail');
@@ -1257,7 +1331,22 @@ function renderResult() {
     <div class="result-stat"><span class="val">${lastResult.duration}s</span><span class="lbl">Time</span></div>
   `;
 
+  document.getElementById('resultPromptOriginal').textContent = lastResult.prompt;
   document.getElementById('resultTranscript').textContent = lastResult.transcript;
+
+  const promptTransEl = document.getElementById('resultPromptTranslation');
+  const transcriptTransEl = document.getElementById('resultTranscriptTranslation');
+  promptTransEl.textContent = 'Translating…';
+  transcriptTransEl.textContent = lastResult.transcript === '(no speech detected)' ? '' : 'Translating…';
+
+  translateText(lastResult.prompt, 'de', 'en').then(t => {
+    promptTransEl.textContent = t || '';
+  });
+  if (lastResult.transcript && lastResult.transcript !== '(no speech detected)') {
+    translateText(lastResult.transcript, 'de', 'en').then(t => {
+      transcriptTransEl.textContent = t || '';
+    });
+  }
 
   const overrideRow = document.getElementById('overrideRow');
   overrideRow.querySelectorAll('.thumb-btn').forEach(b => {
