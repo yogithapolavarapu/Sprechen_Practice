@@ -18,6 +18,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
     --bg: #FFF8EE;
@@ -943,7 +944,9 @@
   <!-- HISTORY SCREEN -->
   <div id="historyScreen" class="hidden">
     <button class="back-link" id="historyBackBtn">← Back</button>
-    <h1 style="font-size:1.4rem; margin-bottom:1rem;">Your sessions</h1>
+    <h1 style="font-size:1.4rem; margin-bottom:1rem;">Your stats</h1>
+    <div class="stats-strip" id="overviewStats"></div>
+    <p class="topic-header" style="margin-top:1.5rem;">Sessions</p>
     <div id="historyList"></div>
   </div>
 
@@ -1024,8 +1027,8 @@ const TIME_PER_RUNG_BY_LEVEL = {
 };
 
 // ── State ─────────────────────────────────────────────────
-const EMOJI_OPTIONS = ['🦕','🦖','🐉','🦴','🥚','🌋','🍃','🦎'];
-const THEME_COLORS = ['#0B4D2E','#3A2E5C','#5C2E2E','#1F4B4B','#5C3D1F','#2E3B5C','#4B2E5C','#1F3D2E'];
+const EMOJI_OPTIONS = ['🦕','🦖','🐉','🦴','🥚','🌋'];
+const THEME_COLORS = ['#7A2E2E','#2E5C7A','#6B4423','#4A2E5C','#2E5C4A','#7A5A2E','#5C2E4A','#2E4A7A'];
 
 let profile = null;
 let currentAvatar = { emoji: null, color: null };
@@ -1047,50 +1050,122 @@ let timerInterval = null;
 let elapsedSeconds = 0;
 let lastResult = null;
 
-function profileKey(suffix) {
-  return `spiel-${suffix}-${profile}`;
+// ── Supabase setup ────────────────────────────────────────
+const SUPABASE_URL = 'https://fthbysugxtuumkgsaful.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0aGJ5c3VneHR1dW1rZ3NhZnVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzMzc4NjksImV4cCI6MjA5NjkxMzg2OX0.wDI6EcWauFbTxQVnmoHXE7Y4xPO9EYUR_ZjZf-WkNH0';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// In-memory caches, populated from Supabase and kept in sync on writes.
+// This keeps most of the app's existing synchronous read calls working
+// while the actual persistence happens against Supabase in the background.
+let knownProfilesCache = [];
+let ladderCache = {};       // { [level]: rung }
+let historyCache = [];      // array of round entries, newest first
+
+async function loadKnownProfiles() {
+  try {
+    const { data, error } = await sb.from('sprechen_profiles').select('*').order('created_at', { ascending: true });
+    if (error) throw error;
+    knownProfilesCache = (data || []).map(p => ({ name: p.name, emoji: p.emoji, color: p.color }));
+  } catch (e) {
+    knownProfilesCache = [];
+  }
+  return knownProfilesCache;
 }
 
 function getKnownProfiles() {
-  try { return JSON.parse(localStorage.getItem('spiel-profiles') || '[]'); }
-  catch (e) { return []; }
-}
-function saveKnownProfiles(list) {
-  localStorage.setItem('spiel-profiles', JSON.stringify(list));
-}
-function upsertKnownProfile(name, emoji, color) {
-  const list = getKnownProfiles();
-  const idx = list.findIndex(p => p.name === name);
-  const entry = { name, emoji, color };
-  if (idx >= 0) list[idx] = entry; else list.push(entry);
-  saveKnownProfiles(list);
+  return knownProfilesCache;
 }
 
-function getLadder() {
-  try { return JSON.parse(localStorage.getItem(profileKey('ladder')) || '{}'); }
-  catch (e) { return {}; }
+async function upsertKnownProfile(name, emoji, color) {
+  const idx = knownProfilesCache.findIndex(p => p.name === name);
+  const entry = { name, emoji, color };
+  if (idx >= 0) knownProfilesCache[idx] = entry; else knownProfilesCache.push(entry);
+  try {
+    await sb.from('sprechen_profiles').upsert({ name, emoji, color });
+  } catch (e) {}
 }
-function saveLadder(ladder) {
-  localStorage.setItem(profileKey('ladder'), JSON.stringify(ladder));
+
+async function renameProfile(oldName, newName, emoji, color) {
+  try {
+    await sb.from('sprechen_profiles').insert({ name: newName, emoji, color });
+    await sb.from('sprechen_rounds').update({ profile: newName }).eq('profile', oldName);
+    await sb.from('sprechen_ladder').update({ profile: newName }).eq('profile', oldName);
+    await sb.from('sprechen_profiles').delete().eq('name', oldName);
+  } catch (e) {}
+  knownProfilesCache = knownProfilesCache.filter(p => p.name !== oldName);
+  knownProfilesCache.push({ name: newName, emoji, color });
 }
+
+async function loadLadder() {
+  ladderCache = {};
+  try {
+    const { data, error } = await sb.from('sprechen_ladder').select('*').eq('profile', profile);
+    if (error) throw error;
+    (data || []).forEach(row => { ladderCache[row.level] = row.rung; });
+  } catch (e) {}
+  return ladderCache;
+}
+
 function getRungFor(level) {
-  const ladder = getLadder();
-  return ladder[level] || 1;
+  return ladderCache[level] || 1;
 }
-function setRungFor(level, rung) {
-  const ladder = getLadder();
-  ladder[level] = Math.max(1, Math.min(RUNG_COUNT, rung));
-  saveLadder(ladder);
+
+async function setRungFor(level, rung) {
+  const clamped = Math.max(1, Math.min(RUNG_COUNT, rung));
+  ladderCache[level] = clamped;
+  try {
+    await sb.from('sprechen_ladder').upsert({ profile, level, rung: clamped });
+  } catch (e) {}
+}
+
+async function loadHistory() {
+  historyCache = [];
+  try {
+    const { data, error } = await sb.from('sprechen_rounds')
+      .select('*')
+      .eq('profile', profile)
+      .order('created_at', { ascending: false })
+      .limit(200);
+    if (error) throw error;
+    historyCache = (data || []).map(r => ({
+      level: r.level,
+      rung: r.rung,
+      prompt: r.prompt,
+      transcript: r.transcript,
+      wordCount: r.word_count,
+      wpm: r.wpm,
+      duration: r.duration,
+      criteria: r.criteria,
+      overallScore: r.overall_score,
+      pass: r.pass,
+      date: r.created_at
+    }));
+  } catch (e) {}
+  return historyCache;
 }
 
 function getHistory() {
-  try { return JSON.parse(localStorage.getItem(profileKey('history')) || '[]'); }
-  catch (e) { return []; }
+  return historyCache;
 }
-function saveHistoryEntry(entry) {
-  const h = getHistory();
-  h.unshift(entry);
-  localStorage.setItem(profileKey('history'), JSON.stringify(h.slice(0, 200)));
+
+async function saveHistoryEntry(entry) {
+  historyCache.unshift(entry);
+  try {
+    await sb.from('sprechen_rounds').insert({
+      profile,
+      level: entry.level,
+      rung: entry.rung,
+      prompt: entry.prompt,
+      transcript: entry.transcript,
+      word_count: entry.wordCount,
+      wpm: entry.wpm,
+      duration: entry.duration,
+      criteria: entry.criteria,
+      overall_score: entry.overallScore,
+      pass: entry.pass
+    });
+  } catch (e) {}
 }
 
 function applyProfileTheme(color) {
@@ -1130,7 +1205,7 @@ function renderLevelTabs() {
   el.querySelectorAll('.level-tab').forEach(b => {
     b.addEventListener('click', () => {
       currentLevel = b.dataset.level;
-      localStorage.setItem(profileKey('level'), currentLevel);
+      localStorage.setItem(`spiel-level-${profile}`, currentLevel);
       currentRung = getRungFor(currentLevel);
       selectedRung = currentRung;
       renderHome();
@@ -1571,8 +1646,8 @@ document.getElementById('overrideRow').querySelectorAll('.thumb-btn').forEach(b 
 document.getElementById('resultBackBtn').addEventListener('click', () => show('homeScreen'));
 document.getElementById('retryBtn').addEventListener('click', () => startGame());
 
-document.getElementById('nextBtn').addEventListener('click', () => {
-  saveHistoryEntry(lastResult);
+document.getElementById('nextBtn').addEventListener('click', async () => {
+  await saveHistoryEntry(lastResult);
   const highest = getRungFor(currentLevel);
   // Only move the ladder if you were playing at your actual unlocked frontier.
   // Replaying an already-cleared lower level is just practice and doesn't change progress.
@@ -1580,7 +1655,7 @@ document.getElementById('nextBtn').addEventListener('click', () => {
     let rung = highest;
     if (lastResult.pass) rung = Math.min(RUNG_COUNT, rung + 1);
     else rung = Math.max(1, rung - 1);
-    setRungFor(currentLevel, rung);
+    await setRungFor(currentLevel, rung);
     selectedRung = rung;
   }
   renderHome();
@@ -1590,6 +1665,28 @@ document.getElementById('nextBtn').addEventListener('click', () => {
 // ── History ───────────────────────────────────────────────
 function renderHistoryScreen() {
   const history = getHistory();
+  const overviewEl = document.getElementById('overviewStats');
+
+  const totalRounds = history.length;
+  const passCount = history.filter(h => h.pass).length;
+  const passRate = totalRounds > 0 ? Math.round((passCount / totalRounds) * 100) : 0;
+  const totalSeconds = history.reduce((s, h) => s + (h.duration || 0), 0);
+  const totalMinutes = Math.round(totalSeconds / 60);
+
+  // Best streak: longest run of consecutive passes, scanning oldest to newest
+  let bestStreak = 0, currentStreak = 0;
+  for (let i = history.length - 1; i >= 0; i--) {
+    if (history[i].pass) { currentStreak++; bestStreak = Math.max(bestStreak, currentStreak); }
+    else currentStreak = 0;
+  }
+
+  overviewEl.innerHTML = `
+    <div class="stat-pill"><span class="num">${totalRounds}</span><span class="label">Rounds</span></div>
+    <div class="stat-pill"><span class="num">${totalRounds ? passRate + '%' : '—'}</span><span class="label">Pass rate</span></div>
+    <div class="stat-pill"><span class="num">${bestStreak}</span><span class="label">Best streak</span></div>
+    <div class="stat-pill"><span class="num">${totalMinutes}m</span><span class="label">Time spoken</span></div>
+  `;
+
   const el = document.getElementById('historyList');
   if (history.length === 0) {
     el.innerHTML = '<div class="empty-state">No rounds played yet. Go climb the ladder!</div>';
@@ -1647,21 +1744,23 @@ function renderAvatarPickers() {
 }
 
 function showProfilePicker() {
-  const known = getKnownProfiles();
-  const list = document.getElementById('profileList');
-  list.innerHTML = known.map(p => `
-    <div class="profile-list-row">
-      <button class="profile-pick-btn" data-profile="${escapeHtml(p.name)}">${avatarChip(p.emoji)} ${escapeHtml(p.name)}</button>
-      <button class="profile-edit-icon" data-profile="${escapeHtml(p.name)}" data-emoji="${escapeHtml(p.emoji || '')}" data-color="${escapeHtml(p.color || '')}" aria-label="Edit">✏️</button>
-    </div>
-  `).join('');
-  list.querySelectorAll('.profile-pick-btn').forEach(b => {
-    b.addEventListener('click', () => selectProfile(b.dataset.profile));
-  });
-  list.querySelectorAll('.profile-edit-icon').forEach(b => {
-    b.addEventListener('click', (e) => {
-      e.stopPropagation();
-      openEditProfileModal(b.dataset.profile, b.dataset.emoji, b.dataset.color);
+  loadKnownProfiles().then(() => {
+    const known = getKnownProfiles();
+    const list = document.getElementById('profileList');
+    list.innerHTML = known.map(p => `
+      <div class="profile-list-row">
+        <button class="profile-pick-btn" data-profile="${escapeHtml(p.name)}">${avatarChip(p.emoji)} ${escapeHtml(p.name)}</button>
+        <button class="profile-edit-icon" data-profile="${escapeHtml(p.name)}" data-emoji="${escapeHtml(p.emoji || '')}" data-color="${escapeHtml(p.color || '')}" aria-label="Edit">✏️</button>
+      </div>
+    `).join('');
+    list.querySelectorAll('.profile-pick-btn').forEach(b => {
+      b.addEventListener('click', () => selectProfile(b.dataset.profile));
+    });
+    list.querySelectorAll('.profile-edit-icon').forEach(b => {
+      b.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openEditProfileModal(b.dataset.profile, b.dataset.emoji, b.dataset.color);
+      });
     });
   });
   selectedEmoji = EMOJI_OPTIONS[Math.floor(Math.random() * EMOJI_OPTIONS.length)];
@@ -1671,7 +1770,7 @@ function showProfilePicker() {
   document.getElementById('profileOverlay').classList.remove('hidden');
 }
 
-function selectProfile(name) {
+async function selectProfile(name) {
   name = name.trim();
   if (!name) return;
   const known = getKnownProfiles();
@@ -1680,7 +1779,7 @@ function selectProfile(name) {
     currentAvatar = { emoji: existing.emoji, color: existing.color };
   } else {
     currentAvatar = { emoji: selectedEmoji, color: selectedColor };
-    upsertKnownProfile(name, selectedEmoji, selectedColor);
+    await upsertKnownProfile(name, selectedEmoji, selectedColor);
   }
   profile = name;
   try { localStorage.setItem('spiel-current-profile', profile); } catch (e) {}
@@ -1689,8 +1788,11 @@ function selectProfile(name) {
   applyProfileTheme(currentAvatar.color);
 
   let savedLevel = 'A1';
-  try { savedLevel = localStorage.getItem(profileKey('level')) || 'A1'; } catch (e) {}
+  try { savedLevel = localStorage.getItem(`spiel-level-${profile}`) || 'A1'; } catch (e) {}
   currentLevel = savedLevel;
+
+  await loadLadder();
+  await loadHistory();
   currentRung = getRungFor(currentLevel);
   selectedRung = currentRung;
   renderHome();
@@ -1747,25 +1849,23 @@ document.getElementById('editProfileCancelBtn').addEventListener('click', () => 
   document.getElementById('editProfileOverlay').classList.add('hidden');
 });
 
-document.getElementById('editProfileSaveBtn').addEventListener('click', () => {
+document.getElementById('editProfileSaveBtn').addEventListener('click', async () => {
   const newName = document.getElementById('editProfileName').value.trim();
   if (!newName || !editingProfileName) return;
   const oldName = editingProfileName;
 
   if (newName !== oldName) {
-    // Move ladder/history/level data to new key
-    ['ladder','history','level'].forEach(suffix => {
-      const oldVal = localStorage.getItem(`spiel-${suffix}-${oldName}`);
-      if (oldVal !== null) {
-        localStorage.setItem(`spiel-${suffix}-${newName}`, oldVal);
-        localStorage.removeItem(`spiel-${suffix}-${oldName}`);
+    await renameProfile(oldName, newName, editingEmoji, editingColor);
+    try {
+      const oldLevel = localStorage.getItem(`spiel-level-${oldName}`);
+      if (oldLevel !== null) {
+        localStorage.setItem(`spiel-level-${newName}`, oldLevel);
+        localStorage.removeItem(`spiel-level-${oldName}`);
       }
-    });
-    const known = getKnownProfiles().filter(p => p.name !== oldName);
-    saveKnownProfiles(known);
+    } catch (e) {}
+  } else {
+    await upsertKnownProfile(newName, editingEmoji, editingColor);
   }
-
-  upsertKnownProfile(newName, editingEmoji, editingColor);
 
   if (profile === oldName) {
     profile = newName;
@@ -1773,6 +1873,9 @@ document.getElementById('editProfileSaveBtn').addEventListener('click', () => {
     try { localStorage.setItem('spiel-current-profile', profile); } catch (e) {}
     document.getElementById('profileLabel').innerHTML = avatarChip(editingEmoji) + ' ' + escapeHtml(profile);
     applyProfileTheme(editingColor);
+    await loadLadder();
+    await loadHistory();
+    renderHome();
   }
 
   document.getElementById('editProfileOverlay').classList.add('hidden');
@@ -1781,9 +1884,10 @@ document.getElementById('editProfileSaveBtn').addEventListener('click', () => {
 
 // ── Init ──────────────────────────────────────────────────
 initDarkMode();
-(function init() {
+(async function init() {
   let saved = '';
   try { saved = localStorage.getItem('spiel-current-profile') || ''; } catch (e) {}
+  await loadKnownProfiles();
   if (saved && getKnownProfiles().some(p => p.name === saved)) {
     selectProfile(saved);
   } else {
