@@ -982,31 +982,118 @@ const PROMPT_BANK = {
   A1: {
     color: '#6FE3C4',
     rungs: {
-      1: ["Wie heißt du?","Wie alt bist du?","Woher kommst du?","Was isst du gern?","Magst du Kaffee oder Tee?"],
-      2: ["Was machst du am Morgen?","Wo wohnst du?","Hast du Geschwister?","Was ist dein Lieblingstier?","Welche Farbe magst du am liebsten?"],
-      3: ["Beschreibe deine Familie kurz.","Was machst du am Wochenende?","Was isst du normalerweise zum Frühstück?","Welche Sprachen sprichst du?","Wie kommst du zur Arbeit oder zur Schule?"],
-      4: ["Was sind deine Hobbys?","Beschreibe dein Zimmer.","Wie ist das Wetter heute?","Was machst du, wenn es regnet?","Erzähl von deinem Lieblingstag der Woche."],
-      5: ["Beschreibe deinen Tagesablauf von morgens bis abends.","Erzähl etwas über deine beste Freundin oder deinen besten Freund.","Was machst du gern in deiner Freizeit, und warum?","Beschreibe dein Lieblingsessen und wie man es macht."]
+      1: [
+        { text: "Wie heißt du?", keywords: ["heiße", "name", "ich bin"] },
+        { text: "Wie alt bist du?", keywords: ["jahre", "alt", "geboren"] },
+        { text: "Woher kommst du?", keywords: ["komme", "aus", "land", "stadt"] },
+        { text: "Was isst du gern?", keywords: ["esse", "mag", "lieblingsessen", "schmeckt"] },
+        { text: "Magst du Kaffee oder Tee?", keywords: ["kaffee", "tee", "trinke", "mag"] }
+      ],
+      2: [
+        { text: "Was machst du am Morgen?", keywords: ["morgen", "aufstehe", "frühstück", "dusche"] },
+        { text: "Wo wohnst du?", keywords: ["wohne", "stadt", "haus", "wohnung"] },
+        { text: "Hast du Geschwister?", keywords: ["bruder", "schwester", "geschwister", "familie"] },
+        { text: "Was ist dein Lieblingstier?", keywords: ["tier", "hund", "katze", "mag"] },
+        { text: "Welche Farbe magst du am liebsten?", keywords: ["farbe", "blau", "rot", "grün", "mag"] }
+      ],
+      3: [
+        { text: "Beschreibe deine Familie kurz.", keywords: ["familie", "mutter", "vater", "eltern", "geschwister"] },
+        { text: "Was machst du am Wochenende?", keywords: ["wochenende", "samstag", "sonntag", "freizeit"] },
+        { text: "Was isst du normalerweise zum Frühstück?", keywords: ["frühstück", "brot", "kaffee", "esse"] },
+        { text: "Welche Sprachen sprichst du?", keywords: ["sprache", "deutsch", "englisch", "spreche"] },
+        { text: "Wie kommst du zur Arbeit oder zur Schule?", keywords: ["arbeit", "schule", "bus", "auto", "fahrrad", "zu fuß"] }
+      ],
+      4: [
+        { text: "Was sind deine Hobbys?", keywords: ["hobby", "sport", "lesen", "musik", "mache gern"] },
+        { text: "Beschreibe dein Zimmer.", keywords: ["zimmer", "bett", "schrank", "tisch", "fenster"] },
+        { text: "Wie ist das Wetter heute?", keywords: ["wetter", "sonne", "regen", "kalt", "warm"] },
+        { text: "Was machst du, wenn es regnet?", keywords: ["regnet", "regen", "hause", "drinnen"] },
+        { text: "Erzähl von deinem Lieblingstag der Woche.", keywords: ["tag", "woche", "lieblingstag", "weil"] }
+      ],
+      5: [
+        { text: "Beschreibe deinen Tagesablauf von morgens bis abends.", keywords: ["morgens", "abends", "aufstehe", "schlafen", "tag"] },
+        { text: "Erzähl etwas über deine beste Freundin oder deinen besten Freund.", keywords: ["freund", "freundin", "kennen", "zusammen"] },
+        { text: "Was machst du gern in deiner Freizeit, und warum?", keywords: ["freizeit", "mache gern", "weil", "spaß"] },
+        { text: "Beschreibe dein Lieblingsessen und wie man es macht.", keywords: ["essen", "kochen", "zutaten", "rezept"] }
+      ]
     }
   },
   A2: {
     color: '#FFC857',
     rungs: {
-      1: ["Was hast du gestern gemacht?","Wohin fährst du gern im Urlaub?","Was machst du, um gesund zu bleiben?","Was kaufst du oft im Supermarkt?","Wie war dein letztes Wochenende?"],
-      2: ["Erzähl von deiner letzten Reise.","Beschreibe deine Traumwohnung.","Was gefällt dir an deiner Stadt?","Wie oft treibst du Sport, und welchen?","Was machst du, wenn du dich krank fühlst?"],
-      3: ["Beschreibe einen typischen Arbeitstag.","Erzähl von einem Einkauf, der schiefgegangen ist.","Möchtest du lieber in der Stadt oder auf dem Land wohnen? Warum?","Wie hast du Deutsch gelernt?","Was war dein schönstes Reiseerlebnis?"],
-      4: ["Erzähl von einem besonderen Tag in deinem Leben.","Was gefällt dir an deinem Job oder Studium, was nicht?","Hattest du schon mal einen schwierigen Tag bei der Arbeit? Erzähl davon.","Wie war deine Wohnung, als du ein Kind warst?","Was würdest du an deiner aktuellen Wohnung ändern?"],
-      5: ["Was war die größte Veränderung in deinem Leben in den letzten Jahren?","Erzähl eine Geschichte von einer Reise, die nicht wie geplant lief.","Beschreibe, wie sich dein Alltag in den letzten Jahren verändert hat.","Vergleiche dein Leben jetzt mit deinem Leben vor fünf Jahren."]
+      1: [
+        { text: "Was hast du gestern gemacht?", keywords: ["gestern", "habe gemacht", "war"] },
+        { text: "Wohin fährst du gern im Urlaub?", keywords: ["urlaub", "reise", "fahre", "land"] },
+        { text: "Was machst du, um gesund zu bleiben?", keywords: ["gesund", "sport", "ernährung", "schlafen"] },
+        { text: "Was kaufst du oft im Supermarkt?", keywords: ["supermarkt", "kaufe", "einkaufen", "lebensmittel"] },
+        { text: "Wie war dein letztes Wochenende?", keywords: ["wochenende", "war", "habe gemacht"] }
+      ],
+      2: [
+        { text: "Erzähl von deiner letzten Reise.", keywords: ["reise", "gefahren", "urlaub", "land", "stadt"] },
+        { text: "Beschreibe deine Traumwohnung.", keywords: ["wohnung", "traum", "zimmer", "haus"] },
+        { text: "Was gefällt dir an deiner Stadt?", keywords: ["stadt", "gefällt", "leben", "wohne"] },
+        { text: "Wie oft treibst du Sport, und welchen?", keywords: ["sport", "treibe", "oft", "fitness", "laufen"] },
+        { text: "Was machst du, wenn du dich krank fühlst?", keywords: ["krank", "arzt", "bett", "medizin"] }
+      ],
+      3: [
+        { text: "Beschreibe einen typischen Arbeitstag.", keywords: ["arbeit", "arbeitstag", "büro", "kollegen"] },
+        { text: "Erzähl von einem Einkauf, der schiefgegangen ist.", keywords: ["einkauf", "geschäft", "problem", "schiefgegangen"] },
+        { text: "Möchtest du lieber in der Stadt oder auf dem Land wohnen? Warum?", keywords: ["stadt", "land", "wohnen", "weil"] },
+        { text: "Wie hast du Deutsch gelernt?", keywords: ["deutsch", "gelernt", "kurs", "lernen"] },
+        { text: "Was war dein schönstes Reiseerlebnis?", keywords: ["reise", "erlebnis", "schön", "urlaub"] }
+      ],
+      4: [
+        { text: "Erzähl von einem besonderen Tag in deinem Leben.", keywords: ["besonderer tag", "leben", "erinnerung"] },
+        { text: "Was gefällt dir an deinem Job oder Studium, was nicht?", keywords: ["job", "studium", "arbeit", "gefällt"] },
+        { text: "Hattest du schon mal einen schwierigen Tag bei der Arbeit? Erzähl davon.", keywords: ["schwierig", "arbeit", "problem", "tag"] },
+        { text: "Wie war deine Wohnung, als du ein Kind warst?", keywords: ["wohnung", "kind", "kindheit", "haus"] },
+        { text: "Was würdest du an deiner aktuellen Wohnung ändern?", keywords: ["wohnung", "ändern", "würde"] }
+      ],
+      5: [
+        { text: "Was war die größte Veränderung in deinem Leben in den letzten Jahren?", keywords: ["veränderung", "leben", "jahre", "verändert"] },
+        { text: "Erzähl eine Geschichte von einer Reise, die nicht wie geplant lief.", keywords: ["reise", "geplant", "problem", "geschichte"] },
+        { text: "Beschreibe, wie sich dein Alltag in den letzten Jahren verändert hat.", keywords: ["alltag", "verändert", "jahre", "früher"] },
+        { text: "Vergleiche dein Leben jetzt mit deinem Leben vor fünf Jahren.", keywords: ["leben", "vergleich", "früher", "jetzt"] }
+      ]
     }
   },
   B1: {
     color: '#FF6B5B',
     rungs: {
-      1: ["Was hältst du von sozialen Medien?","Isst du gern vegetarisch? Warum oder warum nicht?","Was ist wichtiger: Geld oder Zeit? Warum?","Magst du es, neue Leute kennenzulernen?","Was denkst du über Homeoffice?"],
-      2: ["Was sind die Vor- und Nachteile, in einer Großstadt zu leben?","Sollten Handys in Schulen verboten werden? Begründe deine Meinung.","Wie wichtig ist Recycling in deinem Alltag?","Was kann man persönlich tun, um die Umwelt zu schützen?","Reist du lieber allein oder mit anderen? Warum?"],
-      3: ["Wo siehst du dich in fünf Jahren?","Was denkst du über den Klimawandel?","Sollte man weniger Fleisch essen? Diskutiere kurz.","Ist es wichtiger, glücklich zu sein oder erfolgreich? Warum?","Diskutiere die Vor- und Nachteile vom Online-Lernen."],
-      4: ["Erzähl von einer Entscheidung, die dein Leben verändert hat.","Beschreibe eine Situation, in der du eine schwierige Entscheidung treffen musstest.","Wie hat sich die Gesellschaft in den letzten zehn Jahren verändert?","Was war die größte Herausforderung, die du je gemeistert hast?","Erzähl von einem Missverständnis, das du mal hattest."],
-      5: ["Manche meinen, Tests in der Schule seien unnötig. Was denkst du, und warum?","Ist es besser, in einer Beziehung die gleichen Interessen zu haben oder unterschiedliche? Begründe.","Sollte man immer die Wahrheit sagen, auch wenn sie weh tut? Diskutiere beide Seiten.","Erzähl eine Geschichte über jemanden, der dich inspiriert hat, und warum."]
+      1: [
+        { text: "Was hältst du von sozialen Medien?", keywords: ["soziale medien", "internet", "instagram", "meinung"] },
+        { text: "Isst du gern vegetarisch? Warum oder warum nicht?", keywords: ["vegetarisch", "fleisch", "essen", "weil"] },
+        { text: "Was ist wichtiger: Geld oder Zeit? Warum?", keywords: ["geld", "zeit", "wichtig", "weil"] },
+        { text: "Magst du es, neue Leute kennenzulernen?", keywords: ["leute", "kennenlernen", "neue", "mag"] },
+        { text: "Was denkst du über Homeoffice?", keywords: ["homeoffice", "arbeit", "zuhause", "meinung"] }
+      ],
+      2: [
+        { text: "Was sind die Vor- und Nachteile, in einer Großstadt zu leben?", keywords: ["vorteile", "nachteile", "großstadt", "leben"] },
+        { text: "Sollten Handys in Schulen verboten werden? Begründe deine Meinung.", keywords: ["handy", "schule", "verboten", "meinung"] },
+        { text: "Wie wichtig ist Recycling in deinem Alltag?", keywords: ["recycling", "umwelt", "alltag", "wichtig"] },
+        { text: "Was kann man persönlich tun, um die Umwelt zu schützen?", keywords: ["umwelt", "schützen", "klima", "persönlich"] },
+        { text: "Reist du lieber allein oder mit anderen? Warum?", keywords: ["reisen", "allein", "andere", "weil"] }
+      ],
+      3: [
+        { text: "Wo siehst du dich in fünf Jahren?", keywords: ["zukunft", "jahre", "siehst", "plan"] },
+        { text: "Was denkst du über den Klimawandel?", keywords: ["klimawandel", "umwelt", "klima", "meinung"] },
+        { text: "Sollte man weniger Fleisch essen? Diskutiere kurz.", keywords: ["fleisch", "essen", "weniger", "meinung"] },
+        { text: "Ist es wichtiger, glücklich zu sein oder erfolgreich? Warum?", keywords: ["glücklich", "erfolgreich", "wichtig", "weil"] },
+        { text: "Diskutiere die Vor- und Nachteile vom Online-Lernen.", keywords: ["online", "lernen", "vorteile", "nachteile"] }
+      ],
+      4: [
+        { text: "Erzähl von einer Entscheidung, die dein Leben verändert hat.", keywords: ["entscheidung", "leben", "verändert"] },
+        { text: "Beschreibe eine Situation, in der du eine schwierige Entscheidung treffen musstest.", keywords: ["situation", "entscheidung", "schwierig"] },
+        { text: "Wie hat sich die Gesellschaft in den letzten zehn Jahren verändert?", keywords: ["gesellschaft", "verändert", "jahre"] },
+        { text: "Was war die größte Herausforderung, die du je gemeistert hast?", keywords: ["herausforderung", "gemeistert", "schwierig"] },
+        { text: "Erzähl von einem Missverständnis, das du mal hattest.", keywords: ["missverständnis", "problem", "kommunikation"] }
+      ],
+      5: [
+        { text: "Manche meinen, Tests in der Schule seien unnötig. Was denkst du, und warum?", keywords: ["test", "schule", "unnötig", "meinung"] },
+        { text: "Ist es besser, in einer Beziehung die gleichen Interessen zu haben oder unterschiedliche? Begründe.", keywords: ["beziehung", "interessen", "gleich", "unterschiedlich"] },
+        { text: "Sollte man immer die Wahrheit sagen, auch wenn sie weh tut? Diskutiere beide Seiten.", keywords: ["wahrheit", "sagen", "ehrlich", "meinung"] },
+        { text: "Erzähl eine Geschichte über jemanden, der dich inspiriert hat, und warum.", keywords: ["inspiriert", "person", "vorbild", "weil"] }
+      ]
     }
   }
 };
@@ -1195,10 +1282,10 @@ function getRecentPrompts(level, rung) {
   }
 }
 
-function rememberPrompt(level, rung, prompt) {
+function rememberPrompt(level, rung, promptText) {
   const options = PROMPT_BANK[level].rungs[rung];
   let recent = getRecentPrompts(level, rung);
-  recent.push(prompt);
+  recent.push(promptText);
   // Keep at most (pool size - 1) remembered, so there's always at least one
   // fresh option left to pick from; older entries fall off first.
   const keepCount = Math.max(1, options.length - 1);
@@ -1211,12 +1298,12 @@ function rememberPrompt(level, rung, prompt) {
 function pickPrompt(level, rung) {
   const options = PROMPT_BANK[level].rungs[rung];
   const recent = getRecentPrompts(level, rung);
-  let pool = options.filter(p => !recent.includes(p));
+  let pool = options.filter(p => !recent.includes(p.text));
   // If everything in this rung has been shown recently (small pool), just
   // use the full set rather than getting stuck with nothing to pick from.
   if (pool.length === 0) pool = options;
   const chosen = pool[Math.floor(Math.random() * pool.length)];
-  rememberPrompt(level, rung, chosen);
+  rememberPrompt(level, rung, chosen.text);
   return chosen;
 }
 
@@ -1302,7 +1389,7 @@ function renderChallengeCard() {
   const badge = document.getElementById('challengeRungBadge');
   badge.textContent = `Level ${selectedRung}`;
   badge.style.background = currentAvatar.color;
-  document.getElementById('challengePromptText').textContent = currentPrompt;
+  document.getElementById('challengePromptText').textContent = currentPrompt.text;
   renderTimePicker();
 }
 
@@ -1342,7 +1429,7 @@ function startGame() {
   elapsedSeconds = 0;
   isRecording = false;
 
-  document.getElementById('gamePromptText').textContent = currentPrompt;
+  document.getElementById('gamePromptText').textContent = currentPrompt.text;
   document.getElementById('liveWords').textContent = 'Tap the mic and start talking…';
   document.getElementById('liveWords').classList.remove('has-text');
   document.getElementById('micBtn').textContent = '🎤';
@@ -1472,6 +1559,20 @@ document.getElementById('finishBtn').addEventListener('click', () => {
 const FILLER_WORDS = ['äh','ähm','also','halt','irgendwie','sozusagen'];
 const CONNECTOR_WORDS = ['und','aber','weil','deshalb','dann','trotzdem','außerdem','denn','also','oder','wenn','obwohl','sondern','während','damit','dadurch','deswegen','allerdings','dafür','dagegen'];
 
+// A small set of very common A1-level words (articles, basic verbs, pronouns,
+// everyday nouns). Used only to flag when a B1 answer leans almost entirely
+// on beginner vocabulary instead of more developed language — not a
+// complete A1 wordlist, just the highest-frequency items.
+const A1_BASIC_WORDS = new Set([
+  'ich','du','er','sie','es','wir','ihr','der','die','das','ein','eine','einen',
+  'ist','sind','war','bin','bist','hat','habe','haben','und','oder','aber',
+  'gut','schlecht','groß','klein','schön','mag','mache','machen','gehe','gehen',
+  'esse','essen','trinke','trinken','sehe','sehen','sage','sagen','komme','kommen',
+  'ja','nein','auch','sehr','viel','wenig','heute','morgen','gestern','immer','nie',
+  'hier','dort','jetzt','dann','was','wer','wo','wie','warum','mein','dein','sein',
+  'haus','tag','zeit','mensch','kind','mann','frau','arbeit','schule','essen'
+]);
+
 // Minimum words expected per rung, tuned per level (B1 expects more than A1 at the same rung number)
 const MIN_WORDS = {
   A1: { 1: 4,  2: 6,  3: 9,  4: 13, 5: 17 },
@@ -1505,12 +1606,29 @@ function scoreRound() {
   const fillerCount = words.filter(w => FILLER_WORDS.includes(w.toLowerCase().replace(/[.,!?]/g, ''))).length;
 
   const minWords = MIN_WORDS[currentLevel][selectedRung];
+  const normalizedWords = words.map(w => w.toLowerCase().replace(/[.,!?]/g, '')).filter(Boolean);
+  const transcriptLower = transcript.toLowerCase();
 
-  // 1. Aufgabenerfüllung (Task fulfillment) — did you say enough to actually engage with the prompt?
+  // 1. Aufgabenerfüllung (Task fulfillment) — combines "did you say enough"
+  // with a relevance check against topic keywords expected for this prompt.
+  // This is still a heuristic (keyword presence, not real understanding),
+  // but it catches the obvious case of rambling about something unrelated.
   const fulfillmentRatio = wordCount / minWords;
-  const taskFulfillment = Math.round(Math.min(100, fulfillmentRatio * 100));
+  const lengthScore = Math.min(100, fulfillmentRatio * 100);
+  const promptKeywords = currentPrompt.keywords || [];
+  const matchedKeywords = promptKeywords.filter(kw => transcriptLower.includes(kw.toLowerCase()));
+  const relevanceRatio = promptKeywords.length > 0 ? matchedKeywords.length / promptKeywords.length : 1;
+  // Even one matched keyword counts for a lot — these are loose topic signals,
+  // not an exhaustive checklist, so we don't expect every keyword to appear.
+  const relevanceScore = promptKeywords.length > 0
+    ? Math.min(100, 40 + relevanceRatio * 200)
+    : 100;
+  const taskFulfillment = Math.round(lengthScore * 0.5 + Math.min(100, relevanceScore) * 0.5);
 
-  // 2. Flüssigkeit (Fluency) — pace, plus penalty for long pauses between spoken chunks
+  // 2. Flüssigkeit (Fluency) — pace, plus a penalty for long pauses between
+  // spoken chunks. Note: pause timing comes from speech-recognition result
+  // timestamps, which browsers batch somewhat unpredictably — treat this as
+  // a rough signal, not a precise measurement of real silence.
   let longestGapSec = 0;
   for (let i = 1; i < speechTimestamps.length; i++) {
     const gap = (speechTimestamps[i] - speechTimestamps[i - 1]) / 1000;
@@ -1525,12 +1643,23 @@ function scoreRound() {
   const fillerPenalty = wordCount > 0 ? Math.min(20, (fillerCount / wordCount) * 100) : 0;
   fluencyScore = Math.max(0, Math.round(fluencyScore - pausePenalty - fillerPenalty));
 
-  // 3. Wortschatz (Vocabulary range) — lexical diversity vs. level-tuned target
-  const normalizedWords = words.map(w => w.toLowerCase().replace(/[.,!?]/g, '')).filter(Boolean);
+  // 3. Wortschatz (Vocabulary range) — lexical diversity vs. level-tuned
+  // target, plus (B1 only) a check that you're not relying purely on basic
+  // A1-level words when more advanced vocabulary would be expected.
   const uniqueWords = new Set(normalizedWords);
   const diversityRatio = normalizedWords.length > 0 ? uniqueWords.size / normalizedWords.length : 0;
   const targetRatio = VOCAB_TARGET_RATIO[currentLevel];
-  const vocabScore = Math.round(Math.min(100, (diversityRatio / targetRatio) * 100));
+  let vocabScore = Math.round(Math.min(100, (diversityRatio / targetRatio) * 100));
+  if (currentLevel === 'B1' && normalizedWords.length > 0) {
+    const basicCount = normalizedWords.filter(w => A1_BASIC_WORDS.has(w)).length;
+    const basicRatio = basicCount / normalizedWords.length;
+    // If the vast majority of words used are A1-level basics, dock the score —
+    // some basic words are unavoidable (articles, common verbs), so only
+    // penalize when they dominate the answer.
+    if (basicRatio > 0.7) {
+      vocabScore = Math.round(vocabScore * (1 - (basicRatio - 0.7)));
+    }
+  }
 
   // 4. Kohärenz (Coherence) — use of connecting words to link ideas
   const connectorCount = normalizedWords.filter(w => CONNECTOR_WORDS.includes(w)).length;
@@ -1542,9 +1671,9 @@ function scoreRound() {
   const correctnessScore = Math.round((taskFulfillment + fluencyScore + vocabScore + coherenceScore) / 4);
 
   const criteria = [
-    { key: 'erfullung', name: 'Aufgabenerfüllung', desc: 'Did you say enough to address the prompt?', score: taskFulfillment },
-    { key: 'flussigkeit', name: 'Flüssigkeit', desc: 'Pace and smoothness of speech', score: fluencyScore },
-    { key: 'wortschatz', name: 'Wortschatz', desc: 'Range of vocabulary used', score: vocabScore },
+    { key: 'erfullung', name: 'Aufgabenerfüllung', desc: 'Length and relevance to the prompt', score: taskFulfillment },
+    { key: 'flussigkeit', name: 'Flüssigkeit', desc: 'Pace and smoothness (rough signal)', score: fluencyScore },
+    { key: 'wortschatz', name: 'Wortschatz', desc: 'Range and level of vocabulary used', score: vocabScore },
     { key: 'koharenz', name: 'Kohärenz', desc: 'Linking ideas with connectors', score: coherenceScore },
     { key: 'korrektheit', name: 'Korrektheit', desc: 'Estimated overall accuracy', score: correctnessScore }
   ];
@@ -1566,7 +1695,7 @@ function scoreRound() {
   lastResult = {
     level: currentLevel,
     rung: selectedRung,
-    prompt: currentPrompt,
+    prompt: currentPrompt.text,
     transcript: transcript || '(no speech detected)',
     wordCount, wpm, fillerCount, duration,
     criteria,
