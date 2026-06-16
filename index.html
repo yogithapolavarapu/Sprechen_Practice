@@ -1088,6 +1088,12 @@ function getEffectiveTimeLimit() {
 
 function renderTimePicker() {
   const el = document.getElementById('timePicker');
+  if (currentLevel !== 'B1') {
+    el.innerHTML = '';
+    el.style.display = 'none';
+    return;
+  }
+  el.style.display = 'flex';
   const defaultTime = TIME_PER_RUNG[selectedRung];
   const options = [10, 20, 30, 45, 60, 90].filter(t => t !== defaultTime);
   const chips = [
