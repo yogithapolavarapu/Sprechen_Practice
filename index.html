@@ -788,6 +788,33 @@
     gap: 8px;
   }
 
+  .freepass-row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    background: #b79d4822;
+    border: 1.5px dashed #b79d48;
+    border-radius: 14px;
+    padding: 0.7rem 0.9rem;
+    cursor: pointer;
+    margin-bottom: 0.8rem;
+    text-align: left;
+  }
+
+  .freepass-pick {
+    font-family: 'Fraunces', serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .freepass-sub {
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+    margin-top: 2px;
+  }
+
   .profile-pick-btn {
     flex: 1;
     display: flex;
@@ -934,7 +961,9 @@
 
     <div class="criteria-box" id="criteriaBox"></div>
 
-    <div class="transcript-box">
+    <div class="criteria-box hidden" id="cefrEstimateBox"></div>
+
+    <div class="transcript-box" id="promptBox">
       <p class="tb-label">The prompt</p>
       <p id="resultPromptOriginal"></p>
       <p id="resultPromptTranslation" style="color:var(--ink-soft); font-style:italic; margin-top:6px;"></p>
@@ -952,6 +981,11 @@
       <button class="btn btn-secondary" id="retryBtn">🔁 Do it again</button>
       <button class="btn btn-primary" id="nextBtn">Next prompt →</button>
     </div>
+
+    <div class="game-actions hidden" id="freepassResultActions">
+      <button class="btn btn-secondary" id="freepassAgainBtn">🔁 Speak again</button>
+      <button class="btn btn-primary" id="freepassDoneBtn">Done</button>
+    </div>
   </div>
 
   <!-- HISTORY SCREEN -->
@@ -963,10 +997,24 @@
     <div id="historyList"></div>
   </div>
 
+  <!-- FREEPASS SETUP SCREEN -->
+  <div id="freepassSetupScreen" class="hidden">
+    <button class="back-link" id="freepassBackBtn">← Back</button>
+    <h1 style="font-size:1.4rem; margin-bottom:0.4rem;">🥚 FreePass</h1>
+    <p class="result-sub" style="margin-bottom:1.5rem;">Speak about anything you like. We'll check your pronunciation flow, pace, vocabulary, and estimate your level — nothing gets saved.</p>
+    <p class="modal-label">Pick a time limit</p>
+    <div class="time-picker" id="freepassTimePicker"></div>
+    <button class="play-btn" id="freepassPlayBtn" style="margin-top:1.5rem;">▶ Speak now</button>
+  </div>
+
   <!-- PROFILE PICKER MODAL -->
   <div class="modal-overlay hidden" id="profileOverlay">
     <div class="modal">
       <p class="modal-title">Who's playing?</p>
+      <button class="profile-list-row freepass-row" id="freepassBtn" type="button">
+        <span class="profile-pick-btn freepass-pick">🥚 FreePass</span>
+        <span class="freepass-sub">Check your pronunciation — no ladder, nothing saved</span>
+      </button>
       <div class="profile-list" id="profileList"></div>
       <label class="modal-label" for="newProfileInput">Or add a new name</label>
       <input id="newProfileInput" autocomplete="off" placeholder="Your name" />
@@ -1127,8 +1175,14 @@ const TIME_PER_RUNG_BY_LEVEL = {
 };
 
 // ── State ─────────────────────────────────────────────────
-const EMOJI_OPTIONS = ['🦕','🦖','🐉','🦴','🥚','🌋'];
-const THEME_COLORS = ['#7A2E2E','#2E5C7A','#6B4423','#4A2E5C','#2E5C4A','#7A5A2E','#5C2E4A','#2E4A7A'];
+const EMOJI_OPTIONS = ['🦕','🦖','🐉','🦴','🌋'];
+const THEME_COLORS = ['#7A2E2E','#2E5C7A','#4A2E5C','#2E5C4A','#2E4A7A'];
+
+// Reserved for the special FreePass profile — never offered in the regular picker.
+const FREEPASS_NAME = 'FreePass';
+const FREEPASS_EMOJI = '🥚';
+const FREEPASS_COLOR = '#b79d48';
+const FREEPASS_TIME_OPTIONS = [10, 20, 30, 40, 50];
 
 let profile = null;
 let currentAvatar = { emoji: null, color: null };
@@ -1149,6 +1203,9 @@ let sessionStartTime = null;
 let timerInterval = null;
 let elapsedSeconds = 0;
 let lastResult = null;
+
+let isFreepassMode = false;
+let freepassTimeLimit = 20;
 
 // ── Supabase setup ────────────────────────────────────────
 const SUPABASE_URL = 'https://fthbysugxtuumkgsaful.supabase.co';
@@ -1303,7 +1360,7 @@ function escapeHtml(s) {
 }
 
 function show(id) {
-  ['homeScreen','gameScreen','resultScreen','historyScreen'].forEach(s => {
+  ['homeScreen','gameScreen','resultScreen','historyScreen','freepassSetupScreen'].forEach(s => {
     document.getElementById(s).classList.toggle('hidden', s !== id);
   });
 }
@@ -1392,6 +1449,7 @@ function renderLadder() {
 }
 
 function getEffectiveTimeLimit() {
+  if (isFreepassMode) return freepassTimeLimit;
   return customTimeOverride || TIME_PER_RUNG_BY_LEVEL[currentLevel][selectedRung];
 }
 
@@ -1420,6 +1478,40 @@ function renderTimePicker() {
     });
   });
 }
+
+function renderFreepassTimePicker() {
+  const el = document.getElementById('freepassTimePicker');
+  el.innerHTML = FREEPASS_TIME_OPTIONS.map(t =>
+    `<button type="button" class="time-chip ${freepassTimeLimit === t ? 'selected' : ''}" data-time="${t}">${t}s</button>`
+  ).join('');
+  el.querySelectorAll('.time-chip').forEach(b => {
+    b.addEventListener('click', () => {
+      freepassTimeLimit = parseInt(b.dataset.time);
+      renderFreepassTimePicker();
+    });
+  });
+}
+
+document.getElementById('freepassBtn').addEventListener('click', () => {
+  isFreepassMode = true;
+  profile = FREEPASS_NAME;
+  currentAvatar = { emoji: FREEPASS_EMOJI, color: FREEPASS_COLOR };
+  document.getElementById('profileOverlay').classList.add('hidden');
+  document.getElementById('profileLabel').innerHTML = avatarChip(FREEPASS_EMOJI) + ' ' + FREEPASS_NAME;
+  applyProfileTheme(FREEPASS_COLOR);
+  renderFreepassTimePicker();
+  show('freepassSetupScreen');
+});
+
+document.getElementById('freepassBackBtn').addEventListener('click', () => {
+  isFreepassMode = false;
+  showProfilePicker();
+});
+
+document.getElementById('freepassPlayBtn').addEventListener('click', () => {
+  currentPrompt = null;
+  startGame();
+});
 
 function renderChallengeCard() {
   currentPrompt = pickPrompt(currentLevel, selectedRung);
@@ -1467,7 +1559,13 @@ function startGame() {
   elapsedSeconds = 0;
   isRecording = false;
 
-  document.getElementById('gamePromptText').textContent = currentPrompt.text;
+  const promptCard = document.querySelector('#gameScreen .game-prompt-card');
+  if (isFreepassMode) {
+    promptCard.classList.add('hidden');
+  } else {
+    promptCard.classList.remove('hidden');
+    document.getElementById('gamePromptText').textContent = currentPrompt.text;
+  }
   document.getElementById('liveWords').textContent = 'Tap the mic and start talking…';
   document.getElementById('liveWords').classList.remove('has-text');
   document.getElementById('micBtn').textContent = '🎤';
@@ -1486,7 +1584,7 @@ function startGame() {
 
 document.getElementById('exitGameBtn').addEventListener('click', () => {
   stopRecording();
-  show('homeScreen');
+  show(isFreepassMode ? 'freepassSetupScreen' : 'homeScreen');
 });
 
 function updateClock(elapsed, limit) {
@@ -1641,6 +1739,19 @@ function tierFor(score) {
   return TIERS.find(t => score >= t.min) || TIERS[TIERS.length - 1];
 }
 
+function estimateCefrLevel(a1Count, a2Count, b1Count) {
+  const classifiedCount = a1Count + a2Count + b1Count;
+  if (classifiedCount === 0) return null;
+  // Weight toward the higher levels actually present — using even a modest
+  // amount of B1 vocabulary is a stronger signal than a large pile of A1
+  // basics, since basic words are unavoidable at any level.
+  const a2Ratio = a2Count / classifiedCount;
+  const b1Ratio = b1Count / classifiedCount;
+  if (b1Ratio >= 0.12) return 'B1';
+  if (a2Ratio >= 0.18) return 'A2';
+  return 'A1';
+}
+
 function scoreRound() {
   const transcript = (finalTranscript + interimTranscript).trim();
   const words = transcript.split(/\s+/).filter(Boolean);
@@ -1649,10 +1760,15 @@ function scoreRound() {
   const duration = Math.max(1, elapsedSeconds);
   const wpm = wordCount > 0 ? Math.round((wordCount / duration) * 60) : 0;
   const fillerCount = words.filter(w => FILLER_WORDS.includes(w.toLowerCase().replace(/[.,!?]/g, ''))).length;
-
-  const minWords = MIN_WORDS[currentLevel][selectedRung];
   const normalizedWords = words.map(w => w.toLowerCase().replace(/[.,!?]/g, '')).filter(Boolean);
   const transcriptLower = transcript.toLowerCase();
+
+  if (isFreepassMode) {
+    scoreFreepassRound(words, wordCount, wpm, fillerCount, duration, normalizedWords);
+    return;
+  }
+
+  const minWords = MIN_WORDS[currentLevel][selectedRung];
 
   // 1. Aufgabenerfüllung (Task fulfillment) — combines "did you say enough"
   // with a relevance check against topic keywords expected for this prompt.
@@ -1763,8 +1879,66 @@ function scoreRound() {
   show('resultScreen');
 }
 
-async function translateText(text, fromLang, toLang) {
-  if (!text || text.trim().length === 0) return '';
+// FreePass: no prompt, no rung, no pass/fail, nothing saved. Just fluency,
+// vocabulary range, coherence, and an estimated CEFR level from the words
+// actually used. Aufgabenerfüllung is skipped entirely since there's no
+// prompt to be relevant to, and Korrektheit is dropped along with it since
+// it was just an average of the other criteria anyway.
+function scoreFreepassRound(words, wordCount, wpm, fillerCount, duration, normalizedWords) {
+  let longestGapSec = 0;
+  for (let i = 1; i < speechTimestamps.length; i++) {
+    const gap = (speechTimestamps[i] - speechTimestamps[i - 1]) / 1000;
+    if (gap > longestGapSec) longestGapSec = gap;
+  }
+  let fluencyScore;
+  if (wpm === 0) fluencyScore = 0;
+  else if (wpm < 40) fluencyScore = (wpm / 40) * 70;
+  else if (wpm <= 150) fluencyScore = 100;
+  else fluencyScore = Math.max(60, 100 - (wpm - 150) * 0.3);
+  const pausePenalty = Math.min(40, Math.max(0, longestGapSec - 3) * 10);
+  const fillerPenalty = wordCount > 0 ? Math.min(20, (fillerCount / wordCount) * 100) : 0;
+  fluencyScore = Math.max(0, Math.round(fluencyScore - pausePenalty - fillerPenalty));
+
+  const uniqueWords = new Set(normalizedWords);
+  const diversityRatio = normalizedWords.length > 0 ? uniqueWords.size / normalizedWords.length : 0;
+  // No declared level here, so use a generic middle-of-the-road diversity target.
+  const vocabScore = Math.round(Math.min(100, (diversityRatio / 0.55) * 100));
+
+  const connectorCount = normalizedWords.filter(w => CONNECTOR_WORDS.includes(w)).length;
+  const expectedConnectors = Math.max(1, Math.floor(wordCount / 15));
+  const coherenceScore = Math.round(Math.min(100, (connectorCount / expectedConnectors) * 100));
+
+  const wordLevels = normalizedWords.map(w => classifyWord(w));
+  const a1Count = wordLevels.filter(lvl => lvl === 'A1').length;
+  const a2Count = wordLevels.filter(lvl => lvl === 'A2').length;
+  const b1Count = wordLevels.filter(lvl => lvl === 'B1').length;
+  const estimatedLevel = estimateCefrLevel(a1Count, a2Count, b1Count);
+
+  const criteria = [
+    { key: 'flussigkeit', name: 'Flüssigkeit', desc: 'Pace and smoothness (rough signal)', score: fluencyScore },
+    { key: 'wortschatz', name: 'Wortschatz', desc: 'Range of vocabulary used', score: vocabScore },
+    { key: 'koharenz', name: 'Kohärenz', desc: 'Linking ideas with connectors', score: coherenceScore }
+  ];
+  const overallScore = Math.round(criteria.reduce((s, c) => s + c.score, 0) / criteria.length);
+
+  lastResult = {
+    level: null,
+    rung: null,
+    prompt: null,
+    transcript: (finalTranscript + interimTranscript).trim() || '(no speech detected)',
+    wordCount, wpm, fillerCount, duration,
+    criteria,
+    overallScore,
+    estimatedLevel,
+    vocabBreakdown: { a1: a1Count, a2: a2Count, b1: b1Count },
+    pass: null,
+    isFreepass: true,
+    date: new Date().toISOString()
+  };
+
+  renderResult();
+  show('resultScreen');
+}
   try {
     const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${fromLang}|${toLang}`;
     const res = await fetch(url);
@@ -1776,6 +1950,19 @@ async function translateText(text, fromLang, toLang) {
 }
 
 function renderResult() {
+  if (lastResult.isFreepass) {
+    renderFreepassResult();
+    return;
+  }
+
+  // Make sure elements hidden by a previous FreePass result are visible again.
+  document.getElementById('promptBox').classList.remove('hidden');
+  document.getElementById('overrideToggleBtn').classList.remove('hidden');
+  document.getElementById('cefrEstimateBox').classList.add('hidden');
+  document.getElementById('resultBadge').classList.remove('hidden');
+  document.querySelector('#resultScreen .game-actions').classList.remove('hidden');
+  document.getElementById('freepassResultActions').classList.add('hidden');
+
   const badge = document.getElementById('resultBadge');
   badge.className = 'result-badge ' + (lastResult.pass ? 'pass' : 'fail');
   badge.textContent = lastResult.pass ? '🎉' : '💪';
@@ -1879,12 +2066,91 @@ function renderResult() {
     : 'Back to levels →';
 }
 
+function renderFreepassResult() {
+  // Hide everything that doesn't apply when there's no prompt and no pass/fail.
+  document.getElementById('resultBadge').classList.add('hidden');
+  document.getElementById('promptBox').classList.add('hidden');
+  document.getElementById('overrideToggleBtn').classList.add('hidden');
+  document.querySelector('#resultScreen .game-actions').classList.add('hidden');
+  document.getElementById('freepassResultActions').classList.remove('hidden');
+
+  document.getElementById('resultTitle').textContent = 'Here\'s how you sounded';
+  document.getElementById('resultSub').textContent = 'No ladder, no pass or fail — just feedback.';
+  document.getElementById('resultTip').classList.add('hidden');
+
+  document.getElementById('resultStats').innerHTML = `
+    <div class="result-stat"><span class="val">${lastResult.wordCount}</span><span class="lbl">Words</span></div>
+    <div class="result-stat"><span class="val">${lastResult.wpm}</span><span class="lbl">WPM</span></div>
+    <div class="result-stat"><span class="val">${lastResult.duration}s</span><span class="lbl">Time</span></div>
+  `;
+
+  const tierColors = { 'Stark': 'var(--mint)', 'Gut': 'var(--accent)', 'Okay': 'var(--yellow)', 'Ausbaufähig': 'var(--coral)', 'Schwach': 'var(--coral)' };
+  document.getElementById('criteriaBox').innerHTML = `
+    <div class="overall-score-row">
+      <span class="overall-score-label">Overall score</span>
+      <span class="overall-score-val">${lastResult.overallScore}/100</span>
+    </div>
+    ${lastResult.criteria.map(c => {
+      const tier = tierFor(c.score);
+      const color = tierColors[tier.label] || 'var(--accent)';
+      return `
+        <div class="criteria-row">
+          <div class="criteria-info">
+            <p class="criteria-name">${c.name}</p>
+            <p class="criteria-desc">${c.desc}</p>
+          </div>
+          <div class="criteria-bar-wrap"><div class="criteria-bar-fill" style="width:${c.score}%; background:${color};"></div></div>
+          <span class="criteria-tier" style="color:${color};">${tier.label}</span>
+        </div>
+      `;
+    }).join('')}
+  `;
+
+  const cefrBox = document.getElementById('cefrEstimateBox');
+  cefrBox.classList.remove('hidden');
+  const { a1, a2, b1 } = lastResult.vocabBreakdown;
+  const classified = a1 + a2 + b1;
+  if (lastResult.estimatedLevel && classified > 0) {
+    cefrBox.innerHTML = `
+      <div class="overall-score-row">
+        <span class="overall-score-label">Estimated level</span>
+        <span class="overall-score-val">${lastResult.estimatedLevel}</span>
+      </div>
+      <p class="criteria-desc" style="margin-bottom:0.5rem;">Based on the vocabulary you used — A1: ${a1}, A2: ${a2}, B1: ${b1} recognized words.</p>
+    `;
+  } else {
+    cefrBox.innerHTML = `
+      <div class="overall-score-row">
+        <span class="overall-score-label">Estimated level</span>
+        <span class="overall-score-val">—</span>
+      </div>
+      <p class="criteria-desc">Not enough recognized vocabulary to estimate a level this time.</p>
+    `;
+  }
+
+  document.getElementById('resultTranscript').textContent = lastResult.transcript;
+  document.getElementById('resultTranscriptTranslation').textContent = '';
+  if (lastResult.transcript && lastResult.transcript !== '(no speech detected)') {
+    translateText(lastResult.transcript, 'de', 'en').then(t => {
+      document.getElementById('resultTranscriptTranslation').textContent = t || '';
+    });
+  }
+}
+
 document.getElementById('overrideToggleBtn').addEventListener('click', () => {
   lastResult.pass = !lastResult.pass;
   renderResult();
 });
 
-document.getElementById('resultBackBtn').addEventListener('click', () => show('homeScreen'));
+document.getElementById('resultBackBtn').addEventListener('click', () => {
+  show(isFreepassMode ? 'freepassSetupScreen' : 'homeScreen');
+});
+
+document.getElementById('freepassAgainBtn').addEventListener('click', () => startGame());
+document.getElementById('freepassDoneBtn').addEventListener('click', () => {
+  isFreepassMode = false;
+  show('homeScreen');
+});
 document.getElementById('retryBtn').addEventListener('click', () => startGame());
 
 document.getElementById('nextBtn').addEventListener('click', async () => {
@@ -2051,6 +2317,7 @@ document.getElementById('newProfileInput').addEventListener('keydown', (e) => {
 
 document.getElementById('switchProfileLink').addEventListener('click', (e) => {
   e.preventDefault();
+  isFreepassMode = false;
   showProfilePicker();
 });
 
