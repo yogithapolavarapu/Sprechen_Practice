@@ -38,16 +38,16 @@
   }
 
   body.dark-mode {
-    --bg: #072614;
-    --ink: #EAF3EC;
-    --ink-soft: #8FAE9B;
+    --bg: #1A1A1A;
+    --ink: #F0EEEA;
+    --ink-soft: #9A9690;
     --coral: #FF8A72;
     --coral-soft: #FF8A7233;
     --yellow: #FFD174;
     --yellow-soft: #FFD17433;
     --mint: #6FE3C4;
     --mint-soft: #6FE3C433;
-    --card: #0E3B22;
+    --card: #262626;
     --border: #ffffff14;
     --shadow: #00000055;
   }
@@ -820,7 +820,7 @@
     </div>
 
     <div class="game-actions">
-      <button class="btn btn-secondary" id="retryBtn">Try again</button>
+      <button class="btn btn-secondary" id="retryBtn">🔁 Do it again</button>
       <button class="btn btn-primary" id="nextBtn">Next prompt →</button>
     </div>
   </div>
@@ -916,6 +916,7 @@ let selectedColor = THEME_COLORS[0];
 let currentLevel = 'A1';
 let currentPrompt = null;
 let currentRung = 1;
+let selectedRung = 1;
 let recognition = null;
 let isRecording = false;
 let finalTranscript = '';
@@ -1010,6 +1011,7 @@ function renderLevelTabs() {
       currentLevel = b.dataset.level;
       localStorage.setItem(profileKey('level'), currentLevel);
       currentRung = getRungFor(currentLevel);
+      selectedRung = currentRung;
       renderHome();
     });
   });
@@ -1017,26 +1019,37 @@ function renderLevelTabs() {
 
 function renderLadder() {
   currentRung = getRungFor(currentLevel);
+  if (selectedRung > currentRung) selectedRung = currentRung;
   const el = document.getElementById('ladderRungs');
   const heights = [30, 42, 54, 66, 78];
   el.innerHTML = '';
   for (let i = 1; i <= RUNG_COUNT; i++) {
-    const state = i < currentRung ? 'done' : i === currentRung ? 'current' : 'locked';
+    const unlocked = i <= currentRung;
+    const isSelected = i === selectedRung;
+    const state = !unlocked ? 'locked' : isSelected ? 'current' : 'done';
     const rungDiv = document.createElement('div');
     rungDiv.className = `rung ${state}`;
+    rungDiv.style.cursor = unlocked ? 'pointer' : 'default';
     rungDiv.innerHTML = `
-      <div class="rung-bar" style="height:${heights[i-1]}px; background:${state === 'locked' ? '' : currentAvatar.color};"></div>
+      <div class="rung-bar" style="height:${heights[i-1]}px; background:${unlocked ? currentAvatar.color : ''};"></div>
       <div class="rung-num">${i}</div>
     `;
+    if (unlocked) {
+      rungDiv.addEventListener('click', () => {
+        selectedRung = i;
+        renderLadder();
+        renderChallengeCard();
+      });
+    }
     el.appendChild(rungDiv);
   }
-  document.getElementById('ladderTitle').textContent = `${currentLevel} ladder · rung ${currentRung} of ${RUNG_COUNT}`;
+  document.getElementById('ladderTitle').textContent = `${currentLevel} levels · playing level ${selectedRung} of ${RUNG_COUNT}`;
 }
 
 function renderChallengeCard() {
-  currentPrompt = pickPrompt(currentLevel, currentRung);
+  currentPrompt = pickPrompt(currentLevel, selectedRung);
   const badge = document.getElementById('challengeRungBadge');
-  badge.textContent = `Rung ${currentRung}`;
+  badge.textContent = `Level ${selectedRung}`;
   badge.style.background = currentAvatar.color;
   document.getElementById('challengePromptText').textContent = currentPrompt;
 }
@@ -1050,7 +1063,7 @@ function renderStats() {
   el.innerHTML = `
     <div class="stat-pill"><span class="num">${count}</span><span class="label">Rounds</span></div>
     <div class="stat-pill"><span class="num">${passRate || '—'}${count ? '%' : ''}</span><span class="label">Pass rate</span></div>
-    <div class="stat-pill"><span class="num">${currentRung}</span><span class="label">Current rung</span></div>
+    <div class="stat-pill"><span class="num">${currentRung}</span><span class="label">Unlocked level</span></div>
   `;
 }
 
@@ -1084,7 +1097,7 @@ function startGame() {
   document.getElementById('discardBtn').classList.add('hidden');
   document.getElementById('finishBtn').classList.add('hidden');
 
-  const limit = TIME_PER_RUNG[currentRung];
+  const limit = TIME_PER_RUNG[selectedRung];
   updateClock(0, limit);
 
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -1114,7 +1127,7 @@ function updateClock(elapsed, limit) {
 
 function startRecording() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  const limit = TIME_PER_RUNG[currentRung];
+  const limit = TIME_PER_RUNG[selectedRung];
 
   if (SpeechRecognition) {
     recognition = new SpeechRecognition();
@@ -1203,18 +1216,18 @@ function scoreRound() {
   const transcript = (finalTranscript + interimTranscript).trim();
   const words = transcript.split(/\s+/).filter(Boolean);
   const wordCount = words.length;
-  const limit = TIME_PER_RUNG[currentRung];
+  const limit = TIME_PER_RUNG[selectedRung];
   const duration = Math.max(1, elapsedSeconds);
   const wpm = Math.round((wordCount / duration) * 60);
   const fillerCount = words.filter(w => FILLER_WORDS.includes(w.toLowerCase().replace(/[.,!?]/g, ''))).length;
 
   // Simple pass threshold: enough words spoken relative to rung expectations
   const minWordsForRung = { 1: 4, 2: 6, 3: 10, 4: 14, 5: 18 };
-  const suggestedPass = wordCount >= minWordsForRung[currentRung] && wpm >= 25;
+  const suggestedPass = wordCount >= minWordsForRung[selectedRung] && wpm >= 25;
 
   lastResult = {
     level: currentLevel,
-    rung: currentRung,
+    rung: selectedRung,
     prompt: currentPrompt,
     transcript: transcript || '(no speech detected)',
     wordCount, wpm, fillerCount, duration,
@@ -1232,10 +1245,11 @@ function renderResult() {
   badge.className = 'result-badge ' + (lastResult.pass ? 'pass' : 'fail');
   badge.textContent = lastResult.pass ? '🎉' : '💪';
 
+  const isFrontier = lastResult.rung === getRungFor(currentLevel);
   document.getElementById('resultTitle').textContent = lastResult.pass ? 'Nice one!' : 'Almost there!';
-  document.getElementById('resultSub').textContent = lastResult.pass
-    ? `Rung ${lastResult.rung} cleared — climbing up!`
-    : `Rung ${lastResult.rung} — let's try an easier one next.`;
+  document.getElementById('resultSub').textContent = isFrontier
+    ? (lastResult.pass ? `Level ${lastResult.rung} cleared — climbing up!` : `Level ${lastResult.rung} — let's try an easier one next.`)
+    : `Level ${lastResult.rung} — just practice, your progress is unchanged.`;
 
   document.getElementById('resultStats').innerHTML = `
     <div class="result-stat"><span class="val">${lastResult.wordCount}</span><span class="lbl">Words</span></div>
@@ -1250,6 +1264,11 @@ function renderResult() {
     b.classList.remove('selected');
     if ((b.dataset.pass === 'true') === lastResult.pass) b.classList.add('selected');
   });
+
+  const atFrontier = selectedRung === getRungFor(currentLevel);
+  document.getElementById('nextBtn').textContent = atFrontier
+    ? (lastResult.pass ? 'Climb up →' : 'Drop down →')
+    : 'Back to levels →';
 }
 
 document.getElementById('overrideRow').querySelectorAll('.thumb-btn').forEach(b => {
@@ -1264,10 +1283,16 @@ document.getElementById('retryBtn').addEventListener('click', () => startGame())
 
 document.getElementById('nextBtn').addEventListener('click', () => {
   saveHistoryEntry(lastResult);
-  let rung = getRungFor(currentLevel);
-  if (lastResult.pass) rung = Math.min(RUNG_COUNT, rung + 1);
-  else rung = Math.max(1, rung - 1);
-  setRungFor(currentLevel, rung);
+  const highest = getRungFor(currentLevel);
+  // Only move the ladder if you were playing at your actual unlocked frontier.
+  // Replaying an already-cleared lower level is just practice and doesn't change progress.
+  if (selectedRung === highest) {
+    let rung = highest;
+    if (lastResult.pass) rung = Math.min(RUNG_COUNT, rung + 1);
+    else rung = Math.max(1, rung - 1);
+    setRungFor(currentLevel, rung);
+    selectedRung = rung;
+  }
   renderHome();
   show('homeScreen');
 });
@@ -1286,7 +1311,7 @@ function renderHistoryScreen() {
       <div class="history-item">
         <div class="history-top">
           <span class="history-result ${h.pass ? 'pass' : 'fail'}">${h.pass ? '👍 Pass' : '👎 Try again'}</span>
-          <span class="history-meta">${h.level} · Rung ${h.rung} · ${date}</span>
+          <span class="history-meta">${h.level} · Level ${h.rung} · ${date}</span>
         </div>
         <p class="history-prompt">${escapeHtml(h.prompt)}</p>
       </div>
@@ -1377,6 +1402,7 @@ function selectProfile(name) {
   try { savedLevel = localStorage.getItem(profileKey('level')) || 'A1'; } catch (e) {}
   currentLevel = savedLevel;
   currentRung = getRungFor(currentLevel);
+  selectedRung = currentRung;
   renderHome();
   show('homeScreen');
 }
